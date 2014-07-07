@@ -1,0 +1,28 @@
+{
+  "name": "smartystreets",
+  "description": "Fast SmartyStreets geocoder",
+  "version": "0.2.0",
+  "maintainers": [
+    {
+      "name": "Tristan Davies",
+      "email": "npm@tristan.io"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faradayio/node_smartystreets.git"
+  },
+  "main": "index.js",
+  "preferGlobal": "true",
+  "bin": {
+    "geokiller": "program.js"
+  },
+  "dependencies": {
+    "async": "~0.9.0",
+    "commander": "~2.2.0",
+    "fast-csv": "^0.4.1",
+    "hiredis": "^0.1.17",
+    "redis-url": "^0.2.0",
+    "request": "~2.36.0"
+  }
+}
