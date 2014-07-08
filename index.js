@@ -97,8 +97,6 @@ var Smartystreets = function(options){
       var mergeRows = {};
 
       body.forEach(function(address){
-        var row = rows[address.input_index];
-
         var mergeRow = mergeRows[address.input_index] = {};
 
         mergeRow.ss_delivery_line_1 = address.delivery_line_1;
@@ -116,7 +114,7 @@ var Smartystreets = function(options){
         mergeRow.ss_dpv_footnotes = address.analysis.dpv_footnotes;
 
         for (var key in mergeRow) {
-          row[key] = mergeRow[key];
+          rows[address.input_index][key] = mergeRow[key];
         }
 
         progress.geocoded++;
@@ -184,13 +182,12 @@ var Smartystreets = function(options){
   });
 
   inputStream.on("end", function(){
-    if (rowBuffer.length > 0) {
-      //flush any remaining rows that haven't been geocoded yet
-      geocoder.push([rowBuffer]);
-      rowBuffer = [];
-    }
-
     var onCacheDrain = function(){
+      if (rowBuffer.length > 0) {
+        //flush any remaining rows that haven't been geocoded yet
+        geocoder.push([rowBuffer]);
+        rowBuffer = [];
+      }
       if (geocoder.idle()) {
         //geocoder is done, close the output stream
         onGeocoderDrain();
