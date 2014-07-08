@@ -14,8 +14,8 @@ program
   .option('-z, --zipcode-col [col]', 'Zipcode col [zipcode]', 'zipcode')
   .option('-c, --city-col [col]', 'City col [city]', 'city')
   .option('-S, --state-col [col]', 'State col [state]', 'state') // short forms are dumb
-  .option('-a, --auth-id [id]', 'SmartyStreets auth id')
-  .option('-A, --auth-token [token]', 'SmartyStreets auth token')
+  .option('-a, --auth-id [id]', 'SmartyStreets auth id [environment variable smartystreets_auth_id]', process.env.SMARTYSTREETS_AUTH_ID)
+  .option('-A, --auth-token [token]', 'SmartyStreets auth token [environment variable smartystreets_auth_token]', process.env.SMARTYSTREETS_AUTH_TOKEN)
   .option('-j, --concurrency [jobs]', 'Maximum number of concurrent requests [256]', 256)
   .option('-r, --redis [url]', 'Redis cache url')
   .parse(process.argv);
