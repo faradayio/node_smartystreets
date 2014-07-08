@@ -4,7 +4,7 @@ var Smartystreets = require('./');
 var program = require('commander');
 var fs = require('fs');
 
-var package = fs.readFileSync(__dirname+'/package.json');
+var package = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
 
 program
   .version(package.version)
