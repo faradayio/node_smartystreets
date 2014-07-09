@@ -89,8 +89,15 @@ var Smartystreets = function(options){
       pool: pool //don't use the default connection pool (for performance)
     }, function(err, response, body){
       if (err || response.statusCode != 200) {
+        if (err && err.code == 'ECONNRESET') {
+          console.error('connection reset, retrying chunk');
+          geocoder.push([rows], function(){
+            self.emit('progress', progress);
+          });
+        } else {
+          console.error(err || response.statusCode, 'api error, check your column names');
+        }
         callback(err || response.statusCode);
-        console.error(err || response.statusCode, 'api error, check your column names');
         return;
       }
 
