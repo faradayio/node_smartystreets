@@ -95,6 +95,17 @@ var Smartystreets = function(options){
       }
 
       var mergeRows = {};
+      var defaultMergeRow = {
+        ss_delivery_line_1: null,
+        ss_city_name: null,
+        ss_zipcode: null,
+        ss_county_name: null,
+        ss_latitude: null,
+        ss_longitude: null,
+        ss_precision: null,
+        ss_dpv_match_code: null,
+        ss_dpv_footnotes: null
+      };
 
       body.forEach(function(address){
         var mergeRow = mergeRows[address.input_index] = {};
@@ -121,6 +132,11 @@ var Smartystreets = function(options){
       });
 
       rows.forEach(function(row, i){
+        var mergeRow = (typeof mergeRows[i] != 'undefined') ? mergeRows[i] : defaultMergeRow;
+        for (var key in mergeRow) {
+          row[key] = mergeRow[key];
+        }
+
         var id = row.__id__;
         delete row.__id__;
         cacheQueue.set(id, (typeof mergeRows[i] == 'undefined') ? 'false' : JSON.stringify(mergeRows[i]));
