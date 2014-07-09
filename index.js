@@ -104,12 +104,16 @@ var Smartystreets = function(options){
       var mergeRows = {};
       var defaultMergeRow = {
         ss_delivery_line_1: null,
+
         ss_city_name: null,
+        ss_state_abbreviation: null,
         ss_zipcode: null,
+
         ss_county_name: null,
         ss_latitude: null,
         ss_longitude: null,
         ss_precision: null,
+
         ss_dpv_match_code: null,
         ss_dpv_footnotes: null
       };
