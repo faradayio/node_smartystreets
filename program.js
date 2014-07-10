@@ -71,8 +71,8 @@ inputStream.pipe(geocodingStream).pipe(outputStream);
 var progressInterval = 1000;
 var nextProgressMessage = progressInterval;
 
-geocodingStream.on('progress', function(progress){
-  if (progress.total >= nextProgressMessage) {
+geocodingStream.on('progress', function(progress, done){
+  if (done || progress.total >= nextProgressMessage) {
 
     var percentage = Math.round((progress.geocoded / progress.total) * 100);
     console.error(progress.total + ' rows processed, ' + progress.geocoded + ' rows geocoded ('+percentage+'%), ' + progress.cached + ' rows cached');

@@ -31,6 +31,49 @@ redisCacheQueue.set = function(key, value, callback){
   redisClient.set(key, value, callback);
 };
 
+var zip5 = function(inputZip){
+  var zip = inputZip;
+  if (!zip) return '';
+
+  zip = zip.split('-')[0];
+
+  if (zip.length >= 7) {
+    zip = zip.substr(0, zip.length-4);
+  }
+
+  while (zip.length < 5) {
+    zip = '0'+zip;
+  }
+
+  var intZip = zip*1;
+
+  if (zip.length != 5 || intZip < 501 || intZip > 99950) {
+    throw new Error('bad zip: '+inputZip);
+  }
+
+  return zip;
+};
+
+var cacheKeyGenerator = function(row, options){
+  var zipCode = row[options.zipcodeCol];
+  if (zipCode) {
+    try {
+      zipCode = zip5(zipCode);
+    } catch (err) {
+      zipCode = '';
+    }
+  }
+  var key = row[options.streetCol] + ':' +
+  (
+    zipCode
+      ? zipCode
+      : row[options.cityCol] + ':' +
+        row[options.stateCol]
+  )
+  key = key.toUpperCase();
+  return key;
+};
+
 var Smartystreets = function(options){
   stream.PassThrough.apply(this);
 
@@ -176,7 +219,7 @@ var Smartystreets = function(options){
   var rowBuffer = [];
 
   inputStream.on("record", function(data){
-    data.__id__ = data[options.streetCol] + ':' + (data[options.zipcodeCol] ? data[options.zipcodeCol] : data[options.cityCol] + ':' + data[options.stateCol]);
+    data.__id__ = cacheKeyGenerator(data, options);
     cacheQueue.push({
       key: data.__id__,
       callback: function(err, reply){
@@ -212,8 +255,12 @@ var Smartystreets = function(options){
     var onCacheDrain = function(){
       if (rowBuffer.length > 0) {
         //flush any remaining rows that haven't been geocoded yet
-        geocoder.push([rowBuffer]);
+        geocoder.push([rowBuffer], function(){
+          self.emit('progress', progress, true);
+        });
         rowBuffer = [];
+      } else {
+        self.emit('progress', progress, true);
       }
       if (geocoder.idle()) {
         //geocoder is done, close the output stream
