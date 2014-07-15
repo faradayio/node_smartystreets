@@ -8,6 +8,8 @@ var querystring = require('querystring');
 var stream = require('stream');
 var util = require('util');
 
+var package = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
+
 var blackholeCacheQueue = async.queue(function(task, callback){
   setTimeout(function(){
     task.callback(null, 'null');
@@ -63,13 +65,12 @@ var cacheKeyGenerator = function(row, options){
       zipCode = '';
     }
   }
-  var key = row[options.streetCol] + ':' +
-  (
+  var key = package.version + ':' + row[options.streetCol] + ':' + (
     zipCode
       ? zipCode
       : row[options.cityCol] + ':' +
         row[options.stateCol]
-  )
+  );
   key = key.toUpperCase();
   return key;
 };
