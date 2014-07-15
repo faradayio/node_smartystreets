@@ -75,6 +75,7 @@ var cacheKeyGenerator = function(row, options){
   return key;
 };
 
+var columnList;
 var ss_columns = [
   'ss_delivery_line_1',
   'ss_primary_number',
@@ -90,12 +91,11 @@ var ss_columns = [
   'ss_dpv_footnotes'
 ];
 var addColumns = function(row){
-  ss_columns.forEach(function(column){
-    if (typeof row[column] == 'undefined') {
-      row[column] = null;
-    }
+  var out = [];
+  columnList.forEach(function(column){
+    out.push(row[column]);
   });
-  return row;
+  return out;
 };
 
 var Smartystreets = function(options){
@@ -230,7 +230,15 @@ var Smartystreets = function(options){
 
   var rowBuffer = [];
 
+  var firstRecord = true;
+
   inputStream.on("record", function(data){
+    if (firstRecord) {
+      columnList = Object.keys(data).concat(ss_columns);
+      outputStream.write(columnList);
+      firstRecord = false;
+    }
+
     data.__id__ = cacheKeyGenerator(data, options);
     cacheQueue.push({
       key: data.__id__,
