@@ -148,6 +148,8 @@ var Smartystreets = function(options){
       var defaultMergeRow = {
         ss_delivery_line_1: null,
 
+        ss_primary_number: null,
+        ss_secondary_number: null,
         ss_city_name: null,
         ss_state_abbreviation: null,
         ss_zipcode: null,
@@ -166,6 +168,8 @@ var Smartystreets = function(options){
 
         mergeRow.ss_delivery_line_1 = address.delivery_line_1;
 
+        mergeRow.ss_primary_number = address.components.primary_number;
+        mergeRow.ss_secondary_number = address.components.secondary_number;
         mergeRow.ss_city_name = address.components.city_name;
         mergeRow.ss_state_abbreviation = address.components.state_abbreviation;
         mergeRow.ss_zipcode = address.components.zipcode;
