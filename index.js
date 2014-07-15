@@ -75,6 +75,29 @@ var cacheKeyGenerator = function(row, options){
   return key;
 };
 
+var ss_columns = [
+  'ss_delivery_line_1',
+  'ss_primary_number',
+  'ss_secondary_number',
+  'ss_city_name',
+  'ss_state_abbreviation',
+  'ss_zipcode',
+  'ss_county_name',
+  'ss_latitude',
+  'ss_longitude',
+  'ss_precision',
+  'ss_dpv_match_code',
+  'ss_dpv_footnotes'
+];
+var addColumns = function(row){
+  ss_columns.forEach(function(column){
+    if (typeof row[column] == 'undefined') {
+      row[column] = null;
+    }
+  });
+  return row;
+};
+
 var Smartystreets = function(options){
   stream.PassThrough.apply(this);
 
@@ -146,23 +169,6 @@ var Smartystreets = function(options){
       }
 
       var mergeRows = {};
-      var defaultMergeRow = {
-        ss_delivery_line_1: null,
-
-        ss_primary_number: null,
-        ss_secondary_number: null,
-        ss_city_name: null,
-        ss_state_abbreviation: null,
-        ss_zipcode: null,
-
-        ss_county_name: null,
-        ss_latitude: null,
-        ss_longitude: null,
-        ss_precision: null,
-
-        ss_dpv_match_code: null,
-        ss_dpv_footnotes: null
-      };
 
       body.forEach(function(address){
         var mergeRow = mergeRows[address.input_index] = {};
@@ -191,7 +197,8 @@ var Smartystreets = function(options){
       });
 
       rows.forEach(function(row, i){
-        var mergeRow = (typeof mergeRows[i] != 'undefined') ? mergeRows[i] : defaultMergeRow;
+        var mergeRow = (typeof mergeRows[i] != 'undefined') ? mergeRows[i] : {};
+
         for (var key in mergeRow) {
           row[key] = mergeRow[key];
         }
@@ -200,7 +207,7 @@ var Smartystreets = function(options){
         delete row.__id__;
         cacheQueue.set(id, (typeof mergeRows[i] == 'undefined') ? 'false' : JSON.stringify(mergeRows[i]));
 
-        outputStream.write(row);
+        outputStream.write(addColumns(row));
 
         progress.total++;
       });
@@ -250,7 +257,7 @@ var Smartystreets = function(options){
             data[key] = reply[key];
           }
           delete data.__id__;
-          outputStream.write(data);
+          outputStream.write(addColumns(row));
         }
       }
     });
