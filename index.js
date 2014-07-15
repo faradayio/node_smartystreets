@@ -257,7 +257,7 @@ var Smartystreets = function(options){
             data[key] = reply[key];
           }
           delete data.__id__;
-          outputStream.write(addColumns(row));
+          outputStream.write(addColumns(data));
         }
       }
     });
