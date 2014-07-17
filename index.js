@@ -75,27 +75,35 @@ var cacheKeyGenerator = function(row, options){
   return key;
 };
 
-var columnList;
-var ss_columns = [
-  'ss_delivery_line_1',
-  'ss_primary_number',
-  'ss_secondary_number',
-  'ss_city_name',
-  'ss_state_abbreviation',
-  'ss_zipcode',
-  'ss_county_name',
-  'ss_latitude',
-  'ss_longitude',
-  'ss_precision',
-  'ss_dpv_match_code',
-  'ss_dpv_footnotes'
-];
-var addColumns = function(row){
-  var out = [];
-  columnList.forEach(function(column){
-    out.push(row[column]);
-  });
-  return out;
+var structuredRow = function(structure, row, prefix, suffix){
+  var output = {};
+  var addField = function(header, value){
+    if (prefix) {
+      header = prefix+header;
+    }
+    if (suffix) {
+      header = header+suffix;
+    }
+    output[header] = value || null;
+  };
+
+  for (var key in structure) {
+    var value = structure[key];
+    if (typeof value == 'object') {
+      for (var subkey in value) {
+        var subvalue = value[subkey];
+        if (subvalue) {
+          var header = (subvalue === true) ? subkey : subvalue;
+          var rowValue = (typeof row[key] == 'object') ? row[key][subkey] : null;
+          addField(header, rowValue);
+        }
+      }
+    } else if (value) {
+      var header = (value === true) ? key : value;
+      addField(header, row[key]);
+    }
+  }
+  return output;
 };
 
 var Smartystreets = function(options){
@@ -112,6 +120,15 @@ var Smartystreets = function(options){
   this.pipe = function(destination, pipeOptions){
     //when asked to pipe this into something, pipe outputStream instead
     return outputStream.pipe(destination, pipeOptions);
+  };
+
+  var columnList;
+  var addColumns = function(row){
+    var out = [];
+    columnList.forEach(function(column){
+      out.push(row[column]);
+    });
+    return out;
   };
 
   var progress = {
@@ -171,29 +188,15 @@ var Smartystreets = function(options){
       var mergeRows = {};
 
       body.forEach(function(address){
-        var mergeRow = mergeRows[address.input_index] = {};
+        if (address.candidate_index == 0) {
+          var mergeRow = mergeRows[address.input_index] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
 
-        mergeRow.ss_delivery_line_1 = address.delivery_line_1;
+          for (var key in mergeRow) {
+            rows[address.input_index][key] = mergeRow[key];
+          }
 
-        mergeRow.ss_primary_number = address.components.primary_number;
-        mergeRow.ss_secondary_number = address.components.secondary_number;
-        mergeRow.ss_city_name = address.components.city_name;
-        mergeRow.ss_state_abbreviation = address.components.state_abbreviation;
-        mergeRow.ss_zipcode = address.components.zipcode;
-
-        mergeRow.ss_county_name = address.metadata.county_name;
-        mergeRow.ss_latitude = address.metadata.latitude;
-        mergeRow.ss_longitude = address.metadata.longitude;
-        mergeRow.ss_precision = address.metadata.precision;
-
-        mergeRow.ss_dpv_match_code = address.analysis.dpv_match_code;
-        mergeRow.ss_dpv_footnotes = address.analysis.dpv_footnotes;
-
-        for (var key in mergeRow) {
-          rows[address.input_index][key] = mergeRow[key];
+          progress.geocoded++;
         }
-
-        progress.geocoded++;
       });
 
       rows.forEach(function(row, i){
@@ -234,6 +237,7 @@ var Smartystreets = function(options){
 
   inputStream.on("record", function(data){
     if (firstRecord) {
+      var ss_columns = Object.keys(structuredRow(options.structure, {}, options.columnPrefix, options.columnSuffix));
       columnList = Object.keys(data).concat(ss_columns);
       outputStream.write(columnList);
       firstRecord = false;

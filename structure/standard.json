@@ -1,0 +1,29 @@
+{
+  "delivery_line_1": true,
+  "delivery_line_2": true,
+  "last_line": true,
+  "components": {
+    "primary_number": true,
+    "street_name": true,
+    "street_predirection": true,
+    "street_postdirection": true,
+    "street_suffix": true,
+    "secondary_number": true,
+    "secondary_designator": true,
+    "city_name": true,
+    "default_city_name": true,
+    "state_abbreviation": true,
+    "zipcode": true,
+    "plus4_code": true
+  },
+  "metadata": {
+    "county_name": true,
+    "latitude": true,
+    "longitude": true,
+    "precision": true
+  },
+  "analysis": {
+    "dpv_match_code": true,
+    "dpv_footnotes": true
+  }
+}

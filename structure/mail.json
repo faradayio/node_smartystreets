@@ -1,0 +1,6 @@
+{
+  "addressee": true,
+  "delivery_line_1": true,
+  "delivery_line_2": true,
+  "last_line": true
+}
