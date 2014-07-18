@@ -62,6 +62,10 @@ The `options` argument is identical to the options used by the command line tool
 * [Tristan Davies](mailto:npm@tristan.io)
 * [Seamus Abshere](mailto:seamus@abshere.net)
 
+## Corporate support
+
+<p><a href="http://faraday.io" alt="Faraday"><img src="https://s3.amazonaws.com/creative.faraday.io/logo.png" alt="Faraday logo"/></a></p>
+
 ## Copyright
 
 Copyright 2014 [Faraday](http://faraday.io)
