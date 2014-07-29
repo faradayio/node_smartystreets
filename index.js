@@ -151,7 +151,9 @@ var Smartystreets = function(options){
   var self = this;
 
   //geocoder is a queue which takes arrays of objects, up to 99 at a time
-  var geocoder = async.queue(function(rows, callback){
+  var geocoder = async.queue(function(item, callback){
+    var rows = item.rows;
+    item.tries++;
     //turn the rows into something smartystreets can read
     var addressList = rows.map(function(d){
       return {
@@ -183,14 +185,21 @@ var Smartystreets = function(options){
       }),
       json: addressList,
       forever: true, //use http keepAlive
-      pool: pool //don't use the default connection pool (for performance)
+      pool: pool, //don't use the default connection pool (for performance)
+      timeout: 1000 * 30 //30 second timeout
     }, function(err, response, body){
       if (err || response.statusCode != 200) {
-        if ((response && response.statusCode === 504) || (err && (err.code == 'ECONNRESET' || err.code == 'ENOTFOUND'))) {
-          console.error('connection failed, retrying chunk', err || response.statusCode);
-          geocoder.push([rows], function(){
-            self.emit('progress', progress);
-          });
+        var acceptableErrorcodes = ['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'ESOCKETTIMEDOUT'];
+        if ((response && response.statusCode === 504) || (err && acceptableErrorcodes.indexOf(err.code) != -1)) {
+          console.error('request failed', err || response.statusCode);
+          if (item.tries == 5) {
+            console.error('  failed 5 times in a row, aborting');
+          } else {
+            console.error('  retrying chunk');
+            geocoder.push(item, function(){
+              self.emit('progress', progress);
+            });
+          }
         } else {
           console.error(err || response.statusCode, 'api error, check your column names');
         }
@@ -266,7 +275,10 @@ var Smartystreets = function(options){
           rowBuffer.push(data);
           //split data into chunks of 70 rows each, testing has shown this to be fastest
           if (rowBuffer.length == 70) {
-            geocoder.push([rowBuffer], function(){
+            geocoder.push({
+              rows: rowBuffer,
+              tries: 0
+            }, function(){
               self.emit('progress', progress);
             });
             rowBuffer = [];
@@ -293,7 +305,10 @@ var Smartystreets = function(options){
     var onCacheDrain = function(){
       if (rowBuffer.length > 0) {
         //flush any remaining rows that haven't been geocoded yet
-        geocoder.push([rowBuffer], function(){
+        geocoder.push({
+          rows: rowBuffer,
+          tries: 0
+        }, function(){
           self.emit('progress', progress, true);
         });
         rowBuffer = [];
