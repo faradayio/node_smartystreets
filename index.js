@@ -200,17 +200,19 @@ var Smartystreets = function(options){
 
       var mergeRows = {};
 
-      body.forEach(function(address){
-        if (address.candidate_index == 0) {
-          var mergeRow = mergeRows[address.input_index] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
+      if (typeof body == 'Object' && Array.isArray(body)) {
+        body.forEach(function(address){
+          if (address.candidate_index == 0) {
+            var mergeRow = mergeRows[address.input_index] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
 
-          for (var key in mergeRow) {
-            rows[address.input_index][key] = mergeRow[key];
+            for (var key in mergeRow) {
+              rows[address.input_index][key] = mergeRow[key];
+            }
+
+            progress.geocoded++;
           }
-
-          progress.geocoded++;
-        }
-      });
+        });
+      }
 
       rows.forEach(function(row, i){
         var mergeRow = (typeof mergeRows[i] != 'undefined') ? mergeRows[i] : {};
