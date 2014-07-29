@@ -90,7 +90,7 @@ geocodingStream.on('progress', function(progress, done){
   if (done || progress.total >= nextProgressMessage) {
 
     var percentage = Math.round((progress.geocoded / progress.total) * 100);
-    console.error(progress.total + ' rows processed, ' + progress.geocoded + ' rows geocoded ('+percentage+'%), ' + progress.cached + ' rows cached');
+    console.error('['+program.input+' -> '+program.output+'] '+progress.total + ' rows processed, ' + progress.geocoded + ' rows geocoded ('+percentage+'%), ' + progress.cached + ' rows cached');
 
     nextProgressMessage += progressInterval;
   }
