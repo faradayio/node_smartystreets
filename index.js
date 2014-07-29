@@ -212,6 +212,8 @@ var Smartystreets = function(options){
             progress.geocoded++;
           }
         });
+      } else {
+        console.error('Bad array:', body);
       }
 
       rows.forEach(function(row, i){
