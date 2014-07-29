@@ -1,21 +1,37 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 var csv = require('fast-csv');
 var async = require('async');
 var redis = require('redis-url');
 var request = require('request');
-var caching = require('caching');
 
 var fs = require('fs');
 var querystring = require('querystring');
 var stream = require('stream');
 var util = require('util');
 
-var cacheVersion = 1;
+var cacheVersion = 0;
 
-var cache;
+var blackholeCacheQueue = async.queue(function(task, callback){
+  setTimeout(function(){
+    task.callback(null, 'null');
+    callback();
+  }, 100);
+}, 512);
+blackholeCacheQueue.set = function(key, value, callback){
+  if (callback) process.nextTick(callback);
+};
 
-var cache = new caching('redis');
+var redisClient;
+var redisCacheQueue = async.queue(function(task, callback){
+  redisClient.get(task.key, function(err, reply){
+    process.nextTick(function(){
+      task.callback(err, reply);
+      callback();
+    });
+  });
+}, 64);
+redisCacheQueue.set = function(key, value, callback){
+  redisClient.set(key, value, callback);
+};
 
 var zip5 = function(inputZip){
   var zip = inputZip;
@@ -106,22 +122,6 @@ var Smartystreets = function(options){
     return outputStream.pipe(destination, pipeOptions);
   };
 
-  if (options.redis) {
-    this.cache = new caching('redis', {
-      client: redis.connect(typeof options.redis == 'string' ? options.redis : undefined)
-    });
-  } else {
-    this.cache = new caching({
-      get: function(key, callback){
-        process.nextTick(function(){
-          callback(null, null);
-        });
-      },
-      set: function(){},
-      remove: function(){}
-    });
-  }
-
   var columnList;
   var addColumns = function(row){
     var out = [];
@@ -134,13 +134,19 @@ var Smartystreets = function(options){
   var progress = {
     total: 0,
     cached: 0,
-    uncached: 0,
     geocoded: 0
   };
 
   var pool = {
     maxSockets: 1024
   };
+
+  var cacheQueue = blackholeCacheQueue;
+
+  if (options.redis) {
+    redisClient = redis.createClient( (typeof options.redis == 'string') ? options.redis : undefined );
+    cacheQueue = redisCacheQueue;
+  }
 
   var self = this;
 
@@ -167,43 +173,37 @@ var Smartystreets = function(options){
     });
 
     if (!addressList.length) {
-      process.nextTick(function(){
-        item.callback(null, {});
-        callback();
-      });
+      process.nextTick(callback);
       return;
     }
 
     //send the post request
-    var ipList = ['liveaddress-api.aws-us-east-1.smartystreets.net', 'liveaddress-api.aws-us-west-1.smartystreets.net', 'liveaddress-api.aws-us-west-2.smartystreets.net'];
-    var ip = ipList[Math.floor(Math.random()*ipList.length)];
     request.post({
-      uri: 'https://'+ip+'/street-address?'+querystring.stringify({
+      uri: 'https://api.smartystreets.com/street-address?'+querystring.stringify({
         'auth-id': options.authId,
         'auth-token': options.authToken
       }),
-      host: 'api.smartystreets.com',
       json: addressList,
       forever: true, //use http keepAlive
       pool: pool, //don't use the default connection pool (for performance)
-      timeout: 1000 * 10 //10 second timeout
+      timeout: 1000 * 30 //30 second timeout
     }, function(err, response, body){
       if (err || response.statusCode != 200) {
         var acceptableErrorcodes = ['ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'ESOCKETTIMEDOUT'];
         if ((response && response.statusCode === 504) || (err && acceptableErrorcodes.indexOf(err.code) != -1)) {
-          //console.error('request failed', err || response.statusCode);
+          console.error('request failed', err || response.statusCode);
           if (item.tries == 5) {
             console.error('  failed 5 times in a row, aborting');
-            item.callback(err || response.statusCode);
           } else {
-            //console.error('  retrying chunk');
-            geocoder.push(item);
+            console.error('  retrying chunk');
+            geocoder.push(item, function(){
+              self.emit('progress', progress);
+            });
           }
         } else {
           console.error(err || response.statusCode, 'api error, check your column names');
-          item.callback(err || response.statusCode);
         }
-        callback();
+        callback(err || response.statusCode);
         return;
       }
 
@@ -212,24 +212,49 @@ var Smartystreets = function(options){
       for (var i = 0; i < body.length; i++) {
         var address = body[i];
         if (address.candidate_index == 0) {
-          mergeRows[rows[address.input_index].__id__] = address;
+          var mergeRow = mergeRows[address.input_index] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
+
+          for (var key in mergeRow) {
+            rows[address.input_index][key] = mergeRow[key];
+          }
+
+          progress.geocoded++;
         }
       }
 
-      item.callback(null, mergeRows);
+      rows.forEach(function(row, i){
+        var mergeRow = (typeof mergeRows[i] != 'undefined') ? mergeRows[i] : {};
+
+        for (var key in mergeRow) {
+          row[key] = mergeRow[key];
+        }
+
+        var id = row.__id__;
+        delete row.__id__;
+        cacheQueue.set(id, (typeof mergeRows[i] == 'undefined') ? 'false' : JSON.stringify(mergeRows[i]));
+
+        outputStream.write(addColumns(row));
+
+        progress.total++;
+      });
+
       callback();
     });
   }, options.concurrency);
 
-  geocoder.saturated = function(){
-    inputStream.pause();
+  var checkForSaturation = function(){
+    if (geocoder.length() == geocoder.concurrency || cacheQueue.length() == cacheQueue.concurrency) {
+      inputStream.pause();
+    } else {
+      inputStream.resume();
+    }
   };
-  geocoder.empty = function(){
-    inputStream.resume();
-  };;
+  geocoder.saturated = checkForSaturation;
+  geocoder.empty = checkForSaturation;
+  cacheQueue.saturated = checkForSaturation;
+  cacheQueue.empty = checkForSaturation;
 
   var rowBuffer = [];
-  var rowCallbacks = {};
 
   var firstRecord = true;
 
@@ -242,55 +267,63 @@ var Smartystreets = function(options){
     }
 
     data.__id__ = cacheKeyGenerator(data, options);
-
-    var ttl = 1000 * 60 * 60 * 24 * 30;
-    self.cache(data.__id__, ttl, function(passalong){
-      progress.uncached++;
-      rowBuffer.push(data);
-      rowCallbacks[data.__id__] = passalong;
-      //split data into chunks of 70 rows each, testing has shown this to be fastest
-      if (rowBuffer.length == 70) {
-        var callbacks = rowCallbacks;
-        var rows = rowBuffer;
-        rowCallbacks = {};
-        rowBuffer = [];
-
-        geocoder.push({
-          rows: rows,
-          tries: 0,
-          callback: function(err, mergeRows){
-            if (err) throw err;
-            for (var id in callbacks) {
-              callbacks[id](null,
-                mergeRows[id] || {});
-            }
+    cacheQueue.push({
+      key: data.__id__,
+      callback: function(err, reply){
+        reply = JSON.parse(reply);
+        if (err || (!reply && reply !== false)) {
+          rowBuffer.push(data);
+          //split data into chunks of 70 rows each, testing has shown this to be fastest
+          if (rowBuffer.length == 70) {
+            geocoder.push({
+              rows: rowBuffer,
+              tries: 0
+            }, function(){
+              self.emit('progress', progress);
+            });
+            rowBuffer = [];
           }
-        });
+        } else {
+          progress.total++;
+          progress.cached++;
+          if (reply !== false) {
+            progress.geocoded++;
+          }
+
+          self.emit('progress', progress);
+          for (var key in reply) {
+            data[key] = reply[key];
+          }
+          delete data.__id__;
+          outputStream.write(addColumns(data));
+        }
       }
-    }, function(err, mergeRow){
-      if (Object.keys(mergeRow).length) {
-        progress.geocoded++;
-      }
-      progress.total++;
-      progress.cached = progress.total - progress.uncached;
-
-      mergeRow = structuredRow(options.structure, mergeRow, options.columnPrefix, options.columnSuffix);
-
-      for (var key in mergeRow) {
-        data[key] = mergeRow[key];
-      }
-
-      delete data.__id__;
-
-      data = addColumns(data);
-
-      outputStream.write(data);
-
-      self.emit('progress', progress);
     });
   });
 
   inputStream.on("end", function(){
+    var onCacheDrain = function(){
+      if (rowBuffer.length > 0) {
+        //flush any remaining rows that haven't been geocoded yet
+        geocoder.push({
+          rows: rowBuffer,
+          tries: 0
+        }, function(){
+          self.emit('progress', progress, true);
+        });
+        rowBuffer = [];
+      } else {
+        self.emit('progress', progress, true);
+      }
+      if (geocoder.idle()) {
+        //geocoder is done, close the output stream
+        onGeocoderDrain();
+      } else {
+        //geocoder isn't done yet, close the output stream when it finishes
+        geocoder.drain = onGeocoderDrain;
+      }
+    };
+
     var onGeocoderDrain = function(){
       for (var key in pool) {
         if (key != 'maxSockets') {
@@ -302,10 +335,18 @@ var Smartystreets = function(options){
         }
       }
       outputStream.end();
-      if (cache.store.client) {
-        cache.store.client.end();
+      if (redisClient) {
+        redisClient.end();
       }
     };
+
+    if (cacheQueue.idle()) {
+      //geocoder is done, close the output stream
+      onCacheDrain();
+    } else {
+      //geocoder isn't done yet, close the output stream when it finishes
+      cacheQueue.drain = onCacheDrain;
+    }
   });
 };
 

@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "async": "~0.9.0",
-    "caching": "git+ssh://git@github.com:ChiperSoft/node-caching.git",
     "commander": "~2.2.0",
     "fast-csv": "^0.4.1",
     "hiredis": "^0.1.17",
