@@ -186,7 +186,7 @@ var Smartystreets = function(options){
       pool: pool //don't use the default connection pool (for performance)
     }, function(err, response, body){
       if (err || response.statusCode != 200) {
-        if (response.statusCode === 504 || (err && (err.code == 'ECONNRESET' || err.code == 'ENOTFOUND'))) {
+        if ((response && response.statusCode === 504) || (err && (err.code == 'ECONNRESET' || err.code == 'ENOTFOUND'))) {
           console.error('connection failed, retrying chunk');
           geocoder.push([rows], function(){
             self.emit('progress', progress);
