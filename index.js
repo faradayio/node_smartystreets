@@ -8,7 +8,7 @@ var querystring = require('querystring');
 var stream = require('stream');
 var util = require('util');
 
-var package = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
+var cacheVersion = 0;
 
 var blackholeCacheQueue = async.queue(function(task, callback){
   setTimeout(function(){
@@ -65,7 +65,7 @@ var cacheKeyGenerator = function(row, options){
       zipCode = '';
     }
   }
-  var key = package.version + ':' + row[options.streetCol] + ':' + (
+  var key = cacheVersion + ':' + row[options.streetCol] + ':' + (
     zipCode
       ? zipCode
       : row[options.cityCol] + ':' +
