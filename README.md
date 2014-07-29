@@ -19,18 +19,22 @@ Usage: smartystreets [options]
 ```
 Options:
 
-  -h, --help                output usage information
-  -V, --version             output the version number
-  -i, --input [file]        Input (csv file) [stdin]
-  -o, --output [file]       Output (csv file) [stdout]
-  -s, --street-col [col]    Street col [street]
-  -z, --zipcode-col [col]   Zipcode col [zipcode]
-  -c, --city-col [col]      City col [city]
-  -S, --state-col [col]     State col [state]
-  -a, --auth-id [id]        SmartyStreets auth id
-  -A, --auth-token [token]  SmartyStreets auth token
-  -j, --concurrency [jobs]  Maximum number of concurrent requests [256]
-  -r, --redis [url]         Redis cache url
+  -h, --help                                  output usage information
+  -V, --version                               output the version number
+  -i, --input [file]                          Input (csv file) [stdin]
+  -o, --output [file]                         Output (csv file) [stdout]
+  -s, --street-col [col]                      Street col [street]
+  -z, --zipcode-col [col]                     Zipcode col [zipcode]
+  -c, --city-col [col]                        City col [city]
+  -S, --state-col [col]                       State col [state]
+  -a, --auth-id [id]                          SmartyStreets auth id [environment variable smartystreets_auth_id]
+  -A, --auth-token [token]                    SmartyStreets auth token [environment variable smartystreets_auth_token]
+  -j, --concurrency [jobs]                    Maximum number of concurrent requests [48]
+  -✈, --column-definition [mode|file|string]  Column definition mode or file [standard]
+  -p, --column-prefix [text]                  Prefix for smartystreets columns in the output file [ss_]
+  -x, --column-suffix [text]                  Suffix for smartystreets columns in the output file
+  -r, --redis [url]                           Redis cache url
+
 ```
 
 ## Geocoding stream API
