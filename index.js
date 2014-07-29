@@ -187,7 +187,7 @@ var Smartystreets = function(options){
     }, function(err, response, body){
       if (err || response.statusCode != 200) {
         if ((response && response.statusCode === 504) || (err && (err.code == 'ECONNRESET' || err.code == 'ENOTFOUND'))) {
-          console.error('connection failed, retrying chunk');
+          console.error('connection failed, retrying chunk', err || response.statusCode);
           geocoder.push([rows], function(){
             self.emit('progress', progress);
           });
