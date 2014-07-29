@@ -16,7 +16,7 @@ program
   .option('-S, --state-col [col]', 'State col [state]', 'state') // short forms are dumb
   .option('-a, --auth-id [id]', 'SmartyStreets auth id [environment variable smartystreets_auth_id]', process.env.SMARTYSTREETS_AUTH_ID)
   .option('-A, --auth-token [token]', 'SmartyStreets auth token [environment variable smartystreets_auth_token]', process.env.SMARTYSTREETS_AUTH_TOKEN)
-  .option('-j, --concurrency [jobs]', 'Maximum number of concurrent requests [256]', 256)
+  .option('-j, --concurrency [jobs]', 'Maximum number of concurrent requests [48]', 48)
   .option('-✈, --column-definition [mode|file|string]', 'Column definition mode or file [standard]', 'standard')
   .option('-p, --column-prefix [text]', 'Prefix for smartystreets columns in the output file [ss_]', 'ss_')
   .option('-x, --column-suffix [text]', 'Suffix for smartystreets columns in the output file', '')
