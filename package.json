@@ -1,7 +1,7 @@
 {
   "name": "smartystreets",
   "description": "Fast SmartyStreets geocoder",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "maintainers": [
     {
       "name": "Tristan Davies",
