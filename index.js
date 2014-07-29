@@ -160,7 +160,20 @@ var Smartystreets = function(options){
         state:    d[options.stateCol] || '',
         zipcode:  d[options.zipcodeCol] || ''
       };
+    }).filter(function(d){
+      if (!d.street) {
+        return false;
+      }
+      if (!d.zipcode || (!d.city && !d.state)) {
+        return false;
+      }
+      return true;
     });
+
+    if (!addressList.length) {
+      process.nextTick(callback);
+      return;
+    }
 
     //send the post request
     request.post({
@@ -173,8 +186,8 @@ var Smartystreets = function(options){
       pool: pool //don't use the default connection pool (for performance)
     }, function(err, response, body){
       if (err || response.statusCode != 200) {
-        if (err && err.code == 'ECONNRESET') {
-          console.error('connection reset, retrying chunk');
+        if (err && (err.code == 'ECONNRESET' || err.code == 'ENOTFOUND')) {
+          console.error('connection failed, retrying chunk');
           geocoder.push([rows], function(){
             self.emit('progress', progress);
           });
