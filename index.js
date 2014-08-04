@@ -249,6 +249,19 @@ var Smartystreets = function(options){
       inputStream.resume();
     }
   };
+  var outputSaturated = false;
+  outputStream.on('drain', function(){
+    outputSaturated = false;
+    checkForSaturation();
+  });
+  var writeToOutput = function(){
+    var success = outputStream.write.apply(outputStream, arguments);
+    if (!success) {
+      outputSaturated = true;
+      checkForSaturation();
+    }
+    return success;
+  };
   geocoder.saturated = checkForSaturation;
   geocoder.empty = checkForSaturation;
   cacheQueue.saturated = checkForSaturation;
@@ -262,7 +275,7 @@ var Smartystreets = function(options){
     if (firstRecord) {
       var ss_columns = Object.keys(structuredRow(options.structure, {}, options.columnPrefix, options.columnSuffix));
       columnList = Object.keys(data).concat(ss_columns);
-      outputStream.write(columnList);
+      writeToOutput(columnList);
       firstRecord = false;
     }
 
@@ -295,7 +308,7 @@ var Smartystreets = function(options){
             data[key] = reply[key];
           }
           delete data.__id__;
-          outputStream.write(addColumns(data));
+          writeToOutput(addColumns(data));
         }
       }
     });
