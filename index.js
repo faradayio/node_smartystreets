@@ -1,3 +1,5 @@
+require('ofe').call();
+
 var csv = require('fast-csv');
 var async = require('async');
 var redis = require('redis-url');

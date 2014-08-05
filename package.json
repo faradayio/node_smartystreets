@@ -1,7 +1,7 @@
 {
   "name": "smartystreets",
   "description": "Fast SmartyStreets geocoder",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "maintainers": [
     {
       "name": "Tristan Davies",
@@ -22,6 +22,7 @@
     "commander": "~2.2.0",
     "fast-csv": "^0.4.1",
     "hiredis": "^0.1.17",
+    "ofe": "^0.1.2",
     "redis-url": "^0.2.0",
     "request": "~2.36.0"
   }
