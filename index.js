@@ -168,7 +168,7 @@ var Smartystreets = function(options){
       if (!d.street) {
         return false;
       }
-      if (!d.zipcode || (!d.city && !d.state)) {
+      if (!d.zipcode && (!d.city && !d.state)) {
         return false;
       }
       return true;
