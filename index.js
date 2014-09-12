@@ -165,13 +165,7 @@ var Smartystreets = function(options){
         zipcode:  d[options.zipcodeCol] || ''
       };
     }).filter(function(d){
-      if (!d.street) {
-        return false;
-      }
-      if (!d.zipcode && (!d.city && !d.state)) {
-        return false;
-      }
-      return true;
+      return d.street ? true : false;
     });
 
     if (!addressList.length) {
