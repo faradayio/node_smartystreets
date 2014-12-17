@@ -21,6 +21,7 @@ program
   .option('-p, --column-prefix [text]', 'Prefix for smartystreets columns in the output file [ss_]', 'ss_')
   .option('-x, --column-suffix [text]', 'Suffix for smartystreets columns in the output file', '')
   .option('-r, --redis [url]', 'Redis cache url')
+  .option('-q, --quiet', "Quiet mode - turn off progress messages")
   .parse(process.argv);
 
 program.concurrency = parseInt(program.concurrency);
@@ -83,15 +84,17 @@ var geocodingStream = new Smartystreets(program);
 //this is where the magic happens
 inputStream.pipe(geocodingStream).pipe(outputStream);
 
-var progressInterval = 1000;
-var nextProgressMessage = progressInterval;
+if (!program.quiet) {
+  var progressInterval = 1000;
+  var nextProgressMessage = progressInterval;
 
-geocodingStream.on('progress', function(progress, done){
-  if (done || progress.total >= nextProgressMessage) {
+  geocodingStream.on('progress', function(progress, done){
+    if (done || progress.total >= nextProgressMessage) {
 
-    var percentage = Math.round((progress.geocoded / progress.total) * 100);
-    console.error('['+program.input+' -> '+program.output+'] '+progress.total + ' rows processed, ' + progress.geocoded + ' rows geocoded ('+percentage+'%), ' + progress.cached + ' rows cached');
+      var percentage = Math.round((progress.geocoded / progress.total) * 100);
+      console.error('['+program.input+' -> '+program.output+'] '+progress.total + ' rows processed, ' + progress.geocoded + ' rows geocoded ('+percentage+'%), ' + progress.cached + ' rows cached');
 
-    nextProgressMessage += progressInterval;
-  }
-});
+      nextProgressMessage += progressInterval;
+    }
+  });
+}
