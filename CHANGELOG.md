@@ -1,3 +1,9 @@
+## 0.8.0 (2014-12-30)
+
+Features:
+
+ - --delimiter option
+
 ## 0.7.0 (2014-09-12)
 
 Features:

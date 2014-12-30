@@ -111,7 +111,7 @@ var structuredRow = function(structure, row, prefix, suffix){
 var Smartystreets = function(options){
   stream.PassThrough.apply(this);
 
-  var inputStream = csv({headers: true});
+  var inputStream = csv({headers: true, delimiter: options.delimiter || ','});
   var outputStream = csv.createWriteStream({headers: true});
 
   this.on('pipe', function(source){
