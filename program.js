@@ -73,7 +73,11 @@ var readStream = options.input == '-' ? process.stdin : fs.createReadStream(opti
 
 var writeStream;
 if (options.outputSplit) {
-  fs.mkdirSync(options.output);
+  try {
+    fs.mkdirSync(options.output);
+  } catch(e) {
+    if ( e.code != 'EEXIST' ) throw e;
+  }
 
   var firstRow = true, rowIndex, headers;
 
