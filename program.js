@@ -7,7 +7,6 @@ var grouper = require('./lib/grouper');
 var geocoder = require('./lib/geocoder');
 var streamSplitter = require('./lib/streamSplitter');
 var through2 = require('through2');
-var terminus = require('terminus');
 
 var package = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
 
