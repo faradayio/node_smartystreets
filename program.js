@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var csv = require('fast-csv');
 var fs = require('fs');
 var options = require('commander');
