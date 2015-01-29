@@ -107,7 +107,7 @@ if (options.outputSplit) {
   writeStream.pipe( process.stdout );
 } else {
   writeStream = csv.createWriteStream();
-  writeStream.pipe( fs.createWriteStream(options.output+'/'+options.output+'.csv') );
+  writeStream.pipe( fs.createWriteStream(options.output) );
 }
 
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
