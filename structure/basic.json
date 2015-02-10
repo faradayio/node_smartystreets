@@ -1,0 +1,14 @@
+{
+ "delivery_line_1": true,
+ "components": {
+   "primary_number": true,
+   "secondary_number": true,
+   "city_name": true,
+   "state_abbreviation": true,
+   "zipcode": true
+ },
+ "metadata": {
+   "latitude": true,
+   "longitude": true
+ }
+}
