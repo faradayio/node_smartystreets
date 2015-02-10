@@ -56,7 +56,7 @@ if (!options.output) {
   options.help();
 }
 
-var columnModes = ['mail', 'standard', 'complete'];
+var columnModes = ['mail', 'standard', 'complete', 'basic'];
 if (columnModes.indexOf(options.columnDefinition) != -1) {
   //modes are in structure/mode.json
   options.structure = JSON.parse( fs.readFileSync(__dirname+'/structure/'+options.columnDefinition+'.json', 'utf8') );
