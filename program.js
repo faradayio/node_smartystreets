@@ -95,7 +95,13 @@ if (options.outputSplit) {
       return false;
     }
 
-    return row[rowIndex];
+    var cell = row[rowIndex];
+
+    while (cell.length < 5) {
+      cell = '0'+cell;
+    }
+
+    return row[rowIndex].substr(0, 2);
   }, function(streamName){
     var source = csv.createWriteStream();
     source.write(headers);
