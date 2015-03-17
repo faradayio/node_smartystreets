@@ -101,7 +101,7 @@ if (options.outputSplit) {
       cell = '0'+cell;
     }
 
-    return row[rowIndex].substr(0, 2);
+    return row[rowIndex].substr(0, 3);
   }, function(streamName){
     var source = csv.createWriteStream();
     source.write(headers);
