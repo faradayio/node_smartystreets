@@ -18,6 +18,8 @@ options
   .option('-z, --zipcode-col [col]', 'Zipcode col [zipcode]', 'zipcode')
   .option('-c, --city-col [col]', 'City col [city]', 'city')
   .option('-S, --state-col [col]', 'State col [state]', 'state') // short forms are dumb
+  .option('--zipcode-filter [zips]', 'Only geocode records in certain zipcodes, comma separated', '')
+  .option('--state-filter [states]', 'Only geocode records in certain states, comma separated', '')
   .option('-d, --delimiter [symbol]', 'CSV delimiter in input file', ',')
   .option('-O, --output-split [column]', 'Write to multiple files divided by column', '')
   .option('-a, --auth-id [id]', 'SmartyStreets auth id [environment variable smartystreets_auth_id]', process.env.SMARTYSTREETS_AUTH_ID)
@@ -55,6 +57,9 @@ if (!options.output) {
   console.error('Please specify an input file');
   options.help();
 }
+
+options.zipcodeFilter = options.zipcodeFilter.length ? options.zipcodeFilter.split(',') : false;
+options.stateFilter = options.stateFilter.length ? options.stateFilter.split(',') : false;
 
 var columnModes = ['mail', 'standard', 'complete', 'basic'];
 if (columnModes.indexOf(options.columnDefinition) != -1) {
@@ -111,6 +116,15 @@ if (options.outputSplit) {
 }
 
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
+  .pipe(through2.obj(function(row, enc, cb){
+    if (options.zipcodeFilter !== false && options.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
+      cb();
+    } else if (options.stateFilter !== false && options.stateFilter.indexOf(row[options.stateCol]) === -1) {
+      cb();
+    } else {
+      cb(null, row);
+    }
+  }))
   .pipe(grouper(70))
   .pipe(geocoder(options))
   .pipe(writeStream);
