@@ -22,6 +22,7 @@ options
   .option('--state-filter [states]', 'Only geocode records in certain states, comma separated', '')
   .option('-d, --delimiter [symbol]', 'CSV delimiter in input file', ',')
   .option('-O, --output-split [column]', 'Write to multiple files divided by column', '')
+  .option('--truncate-split [length]', 'Used with --output-split, truncate column to first X characters', 0)
   .option('-a, --auth-id [id]', 'SmartyStreets auth id [environment variable smartystreets_auth_id]', process.env.SMARTYSTREETS_AUTH_ID)
   .option('-A, --auth-token [token]', 'SmartyStreets auth token [environment variable smartystreets_auth_token]', process.env.SMARTYSTREETS_AUTH_TOKEN)
   .option('-j, --concurrency [jobs]', 'Maximum number of concurrent requests [48]', 48)
@@ -33,6 +34,7 @@ options
   .parse(process.argv);
 
 options.concurrency = parseInt(options.concurrency);
+options.truncateSplit = parseInt(options.truncateSplit);
 
 if (!options.concurrency) {
   console.error('Invalid concurrency');
@@ -102,11 +104,11 @@ if (options.outputSplit) {
 
     var cell = row[rowIndex];
 
-    while (cell.length < 5) {
-      cell = '0'+cell;
+    if (options.truncateSplit !== 0) {
+      cell = cell.substr(0, options.truncateSplit);
     }
 
-    return row[rowIndex].substr(0, 3);
+    return cell;
   }, function(streamName){
     var source = csv.createWriteStream();
     source.write(headers);
