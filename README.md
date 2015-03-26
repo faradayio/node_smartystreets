@@ -147,4 +147,4 @@ The `options` argument is identical to the options used by the command line tool
 
 ## Copyright
 
-Copyright 2014 [Faraday](http://faraday.io)
+Copyright 2015 [Faraday](http://faraday.io)
