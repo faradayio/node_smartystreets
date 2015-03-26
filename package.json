@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "async": "^0.9.0",
-    "commander": "^2.2.0",
-    "fast-csv": "^0.5.6",
-    "request": "^2.36.0",
+    "commander": "^2.7.1",
+    "fast-csv": "^0.5.7",
+    "request": "^2.54.0",
     "terminus": "^1.0.11",
     "through2": "^0.6.3",
     "through2-concurrent": "^0.3.1"
