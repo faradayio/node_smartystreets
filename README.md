@@ -19,21 +19,27 @@ Usage: smartystreets [options]
 ```
 Options:
 
-  -h, --help                                  output usage information
-  -V, --version                               output the version number
-  -i, --input [file]                          Input (csv file) [stdin]
-  -o, --output [file]                         Output (csv file) [stdout]
-  -s, --street-col [col]                      Street col [street]
-  -z, --zipcode-col [col]                     Zipcode col [zipcode]
-  -c, --city-col [col]                        City col [city]
-  -S, --state-col [col]                       State col [state]
-  -a, --auth-id [id]                          SmartyStreets auth id [environment variable smartystreets_auth_id]
-  -A, --auth-token [token]                    SmartyStreets auth token [environment variable smartystreets_auth_token]
-  -j, --concurrency [jobs]                    Maximum number of concurrent requests [48]
-  -✈, --column-definition [mode|file|string]  Column definition mode or file [standard]
-  -p, --column-prefix [text]                  Prefix for smartystreets columns in the output file [ss_]
-  -x, --column-suffix [text]                  Suffix for smartystreets columns in the output file
-  -r, --redis [url]                           Redis cache url
+  -h, --help                      output usage information
+  -V, --version                   output the version number
+  -i, --input [file]              Input (csv file) [stdin]
+  -o, --output [file]             Output (csv file) [stdout]
+  -s, --street-col [col]          Street col [street]
+  -z, --zipcode-col [col]         Zipcode col [zipcode]
+  -c, --city-col [col]            City col [city]
+  -S, --state-col [col]           State col [state]
+  --zipcode-filter [zips]         Only geocode records in certain zipcodes, comma separated
+  --state-filter [states]         Only geocode records in certain states, comma separated
+  -d, --delimiter [symbol]        CSV delimiter in input file
+  -O, --output-split [column]     Write to multiple files divided by column
+  --truncate-split [length]       Used with --output-split, truncate column to first X characters
+  -a, --auth-id [id]              SmartyStreets auth id [environment variable smartystreets_auth_id]
+  -A, --auth-token [token]        SmartyStreets auth token [environment variable smartystreets_auth_token]
+  -j, --concurrency [jobs]        Maximum number of concurrent requests [48]
+  -✈, --column-definition [mode]  Column definition mode or file [standard]
+  -p, --column-prefix [text]      Prefix for smartystreets columns in the output file [ss_]
+  -x, --column-suffix [text]      Suffix for smartystreets columns in the output file
+  -q, --quiet                     Quiet mode - turn off progress messages
+  -l, --log-interval [num]        Show progress after every X number of rows [1000]
 ```
 
 ### parameters
@@ -66,6 +72,22 @@ _Note_: city is only used if zipcode is not present
 
 Not required. Default is 'state'. It should be the name of the column in your input file that contains the state, e.g. 'Vermont'
 
+`--zipcode-filter [zips]`
+
+Not required. Only geocodes records in certain zipcodes. Separate by comma for multiple zips. Example: `--zipcode-filter 05401,05403`. Uses column specified in `--zipcode-col`.
+
+`--state-filter [zips]`
+
+Not required. Only geocodes records in certain states. Separate by comma for multiple states. Example: `--state-filter VT,NY`. Uses column specified in `--state-col`.
+
+`-O, --output-split [column]`
+
+Not required. This will write multiple output files, split by a column value. `--output-split ss_zipcode` will write one file per zipcode, under `output/12345.csv`.
+
+`--truncate-split [length]`
+
+Not required. Used with `--output-split`. It will truncate the column value to a number of characters. `--output-split ss_zipcode --truncate-split 3` will write files like `output/123.csv` which will contain all rows with zipcodes that start with 123.
+
 `-a, --auth-id [id]`
 
 _Required_. You can get this [here](https://smartystreets.com/account/keys) listed under "Security Keys"
@@ -89,14 +111,6 @@ Not required. Default ss_. This is the prefix applied to all columns that are ad
 `-x, --column-suffix [text]`
 
 Not required. Default empty string. This is the suffix applied to all columns that are added to your output file. `delivery_line_1` could become `delivery_line_1_suffixGoesHere`
-
-`-r, --redis [url]`
-
-Not required. Default empty string. If specified, this program will cache results from smartystreets in redis.
-
-Url format: `redis://[db-number[:password]@]host:port[?option=value]`
-
-This is useful in a couple different situations. It will allow you to resume partially completed geocoding, more easily recover from errors, and speed things up if you have a lot of duplicate addresses.
 
 ## Geocoding stream API
 
