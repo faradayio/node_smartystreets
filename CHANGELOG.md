@@ -1,3 +1,33 @@
+## 1.3.0 (2015-4-26)
+
+Fixed request forever/pool issue in node 0.12 https://github.com/request/request/issues/1511
+
+Updated dependencies
+
+## 1.2.0 (2015-4-20)
+
+Features:
+
+  - --truncate-split [len] option. When used with --output-split, it will split by the first X characters in a cell. Example: `--output-split zipcode --truncate-split 3` will split by the first 3 digits of the zipcode column.
+  - --state-filter [state] option. Use it to only geocode records in a certain state. Eg `--state-filter VT`. Uses your state column as specified in `--state-col`.
+  - --zipcode-filter [zipcode] option. Same as above, but with zipcodes.
+
+Bugs:
+
+  - `--output-split` no longer broken
+
+## 1.0.1 - 1.1.0 (2015-3-05 - 2015-4-20)
+
+Fixes a major memory leak in --output-split but due to a mistake in which code was commited to the wrong branch, also breaks output-split. Avoid these versions, use 1.3.0 instead. Oops.
+
+## 1.0.0 (2015-2-27)
+
+Fix issue #30, some extra stability
+
+## 1.0.0-rc.* (a long time)
+
+Playing whack-a-bug
+
 ## 1.0.0-rc.0 (2015-01-02)
 
 Major refactor using through2 streams for cleaner and safer code
