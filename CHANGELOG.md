@@ -1,3 +1,7 @@
+## 1.3.2 (2015-4-27)
+
+Switch to faradayio/forever-agent fork to prevent weird node 0.12 bug
+
 ## 1.3.1 (2015-4-27)
 
 Workaround for https://github.com/npm/npm/issues/7773
