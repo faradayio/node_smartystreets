@@ -1,3 +1,7 @@
+## 1.3.1 (2015-4-27)
+
+Workaround for https://github.com/npm/npm/issues/7773
+
 ## 1.3.0 (2015-4-26)
 
 Fixed request forever/pool issue in node 0.12 https://github.com/request/request/issues/1511
