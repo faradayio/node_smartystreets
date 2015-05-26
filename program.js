@@ -29,6 +29,7 @@ options
   .option('-✈, --column-definition [mode]', 'Column definition mode or file [standard]', 'standard')
   .option('-p, --column-prefix [text]', 'Prefix for smartystreets columns in the output file [ss_]', 'ss_')
   .option('-x, --column-suffix [text]', 'Suffix for smartystreets columns in the output file', '')
+  .option('--include-invalid', 'Activates agressive matching by setting the header X-Include-Invalid to true')
   .option('-q, --quiet', 'Quiet mode - turn off progress messages')
   .option('-l, --log-interval [num]', 'Show progress after every X number of rows [1000]', 1000)
   .parse(process.argv);
