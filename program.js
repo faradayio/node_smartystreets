@@ -125,7 +125,9 @@ if (options.outputSplit) {
 
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
   .pipe(through2.obj(function(row, enc, cb){
-    if (options.zipcodeFilter !== false && options.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
+    if (!row[options.streetCol] || (!row[options.zipcodeCol] && (!row[options.stateCol] || !row[options.cityCol]))) {
+      cb();
+    } else if (options.zipcodeFilter !== false && options.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
       cb();
     } else if (options.stateFilter !== false && options.stateFilter.indexOf(row[options.stateCol]) === -1) {
       cb();
