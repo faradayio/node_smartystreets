@@ -22,7 +22,7 @@
     "commander": "^2.8.1",
     "fast-csv": "^0.6.0",
     "forever-agent": "faradayio/forever-agent",
-    "request": "^2.55.0",
+    "request": "^2.57.0",
     "terminus": "^1.0.11",
     "through2": "^0.6.5",
     "through2-concurrent": "^1.0.0"
