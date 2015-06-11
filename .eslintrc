@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "camelcase":                false,
+    "comma-spacing":            false,
+    "eol-last":                 false,
+    "indent":                   [ 2, 2 ],
+    "key-spacing":              false,
+    "linebreak-style":          "unix",
+    "no-loop-func":             false,
+    "no-multi-spaces":          false,
+    "no-shadow":                false,
+    "no-trailing-spaces":       false,
+    "no-underscore-dangle":     false,
+    "no-unused-expressions":    true,
+    "no-use-before-define":     false,
+    "quotes":                   false,
+    "react/jsx-uses-vars":      true,
+    "react/react-in-jsx-scope": true,
+    "semi":                     "always",
+    "space-infix-ops":          false
+  },
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "ecmaFeatures": {
+    "modules": true
+  }
+}
