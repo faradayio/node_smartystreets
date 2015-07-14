@@ -1,29 +1,24 @@
 {
   "rules": {
-    "camelcase":                false,
-    "comma-spacing":            false,
-    "eol-last":                 false,
+    "camelcase":                0,
+    "comma-spacing":            0,
+    "eol-last":                 0,
     "indent":                   [ 2, 2 ],
-    "key-spacing":              false,
-    "linebreak-style":          "unix",
-    "no-loop-func":             false,
-    "no-multi-spaces":          false,
-    "no-shadow":                false,
-    "no-trailing-spaces":       false,
-    "no-underscore-dangle":     false,
-    "no-unused-expressions":    true,
-    "no-use-before-define":     false,
-    "quotes":                   false,
-    "react/jsx-uses-vars":      true,
-    "react/react-in-jsx-scope": true,
-    "semi":                     "always",
-    "space-infix-ops":          false
+    "key-spacing":              0,
+    "no-loop-func":             0,
+    "no-multi-spaces":          0,
+    "quotes":                   0,
+    "space-infix-ops":          0,
+    "semi-spacing":             0,
+    "no-underscore-dangle":     0,
+    "no-new":                   0
   },
   "env": {
     "es6": true,
     "node": true
   },
   "ecmaFeatures": {
-    "modules": true
-  }
+    "modules": true,
+  },
+  "parser": "babel-eslint"
 }
