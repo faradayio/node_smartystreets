@@ -1,3 +1,19 @@
+## 1.6.0 (2015-7-14)
+
+add --retry-timeout option
+
+## 1.5.1 (2015-6-11)
+
+workaround for memory leak in request module (https://github.com/request/request/issues/1637)
+
+## 1.5.0 (2015-5-26)
+
+add --include-invalid option
+
+## 1.4.1 (2015-5-26)
+
+update dependencies, filter rows for validity before attempting to geocode
+
 ## 1.3.2 (2015-4-27)
 
 Switch to faradayio/forever-agent fork to prevent weird node 0.12 bug
