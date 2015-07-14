@@ -32,6 +32,7 @@ options
   .option('--include-invalid', 'Activates agressive matching by setting the header X-Include-Invalid to true')
   .option('-q, --quiet', 'Quiet mode - turn off progress messages')
   .option('-l, --log-interval [num]', 'Show progress after every X number of rows [1000]', 1000)
+  .option('--retry-timeout [num]', 'Retry failed requests after X milliseconds [30000]', 30000)
   .parse(process.argv);
 
 options.concurrency = parseInt(options.concurrency);
