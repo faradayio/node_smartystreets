@@ -1,3 +1,7 @@
+## 1.6.1 (2015-7-14)
+
+fix bug where using --output-split on a column that had nonsafe characters in it would break
+
 ## 1.6.0 (2015-7-14)
 
 add --retry-timeout option

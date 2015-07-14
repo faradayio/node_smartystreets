@@ -7,6 +7,7 @@ var grouper = require('./lib/grouper');
 var geocoder = require('./lib/geocoder');
 var streamSplitter = require('./lib/streamSplitter');
 var through2 = require('through2');
+var sanitizeFilename = require('sanitize-filename');
 
 var package = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
 
@@ -114,7 +115,7 @@ if (options.outputSplit) {
   }, function(streamName){
     var source = csv.createWriteStream();
     source.write(headers);
-    source.pipe( fs.createWriteStream(options.output+'/'+streamName+'.csv') );
+    source.pipe( fs.createWriteStream(options.output+'/'+sanitizeFilename(streamName)+'.csv') );
     return source;
   }, {objectMode: true});
 } else if (options.output == '-') {
