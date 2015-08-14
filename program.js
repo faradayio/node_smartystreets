@@ -34,6 +34,7 @@ options
   .option('-q, --quiet', 'Quiet mode - turn off progress messages')
   .option('-l, --log-interval [num]', 'Show progress after every X number of rows [1000]', 1000)
   .option('--retry-timeout [num]', 'Retry failed requests after X milliseconds [30000]', 30000)
+  .option('--drop-threshold [rows]', 'Maximum number of rows that can be dropped due to api failures [Infinity]', 'infinity')
   .parse(process.argv);
 
 options.concurrency = parseInt(options.concurrency);
@@ -61,6 +62,16 @@ if (!options.input) {
 if (!options.output) {
   console.error('Please specify an input file');
   options.help();
+}
+
+if (typeof options.dropThreshold !== 'string' || options.dropThreshold.toLowerCase() === 'infinity') {
+  options.dropThreshold = null;
+} else {
+  options.dropThreshold = Number(options.dropThreshold);
+  if (options.dropThreshold < 0 || options.dropThreshold % 1 !== 0) {
+    console.error('invalid drop threshold, if specified it must be a positive integer or zero');
+    options.help();
+  }
 }
 
 options.zipcodeFilter = options.zipcodeFilter.length ? options.zipcodeFilter.split(',') : false;

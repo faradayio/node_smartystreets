@@ -40,6 +40,7 @@ Options:
   -x, --column-suffix [text]      Suffix for smartystreets columns in the output file
   -q, --quiet                     Quiet mode - turn off progress messages
   -l, --log-interval [num]        Show progress after every X number of rows [1000]
+  --drop-threshold [rows]         Maximum number of rows that can be dropped due to api failures [Infinity]
 ```
 
 ### parameters
@@ -111,6 +112,18 @@ Not required. Default ss_. This is the prefix applied to all columns that are ad
 `-x, --column-suffix [text]`
 
 Not required. Default empty string. This is the suffix applied to all columns that are added to your output file. `delivery_line_1` could become `delivery_line_1_suffixGoesHere`
+
+`-q, --quiet`
+
+For when you just want it to shut up already
+
+`-l, --log-interval [num]`
+
+This will log a message every X number of rows to let you know how it's doing. The default is 1,000 and you can configure it with this option.
+
+`--drop-threshold [rows]`
+
+If a batch of rows cannot be geocoded after 5 retries, they will be dropped. You can use this option to limit that. If you set `--drop-threshold 0`, any dropped rows will cause the process to exit with a code of 1. If you set it to 1,000, geocoding failures will be tolerated up to 1,000 rows, then the process will exit with a code of 1.
 
 ## Geocoding stream API
 

@@ -1,3 +1,7 @@
+## 1.7.0 (2015-8-14)
+
+Add --drop-threshold, a solution for issue #31
+
 ## 1.6.2 (2015-7-16)
 
 fix issue #27, allowing geocoding to happen from a single address column
