@@ -116,7 +116,7 @@ if (options.outputSplit) {
       return false;
     }
 
-    var cell = row[rowIndex];
+    var cell = String(row[rowIndex] || '');
 
     if (options.truncateSplit !== 0) {
       cell = cell.substr(0, options.truncateSplit);
