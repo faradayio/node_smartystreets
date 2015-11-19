@@ -41,6 +41,7 @@ Options:
   -q, --quiet                     Quiet mode - turn off progress messages
   -l, --log-interval [num]        Show progress after every X number of rows [1000]
   --drop-threshold [rows]         Maximum number of rows that can be dropped due to api failures [Infinity]
+  --include-invalid               Allows approximate geocoding of records that SmartyStreets considers invalid
 ```
 
 ### parameters
@@ -124,6 +125,10 @@ This will log a message every X number of rows to let you know how it's doing. T
 `--drop-threshold [rows]`
 
 If a batch of rows cannot be geocoded after 5 retries, they will be dropped. You can use this option to limit that. If you set `--drop-threshold 0`, any dropped rows will cause the process to exit with a code of 1. If you set it to 1,000, geocoding failures will be tolerated up to 1,000 rows, then the process will exit with a code of 1.
+
+`--include-invalid`
+
+Not required. Allows approximate geocoding of addresses that SmartyStreets considers invalid. Be cautious - this may introduce potentially-large precision degredation.
 
 ## Geocoding stream API
 
