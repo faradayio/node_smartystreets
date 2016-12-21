@@ -59,14 +59,14 @@ if (!options.input) {
   console.error('Please specify an input file');
   options.help();
 } else {
-  if (options.input == '-') {
-    console.log('***********************************************')
-    console.log('Processing from STDIN')
-    console.log('***********************************************')
-  } else {
-    console.log('***********************************************')
-    console.log('Processing ' + options.input)
-    console.log('***********************************************')
+  if (options.input == '-' && !options.quiet) {
+    console.error('***********************************************')
+    console.error('Processing from STDIN')
+    console.error('***********************************************')
+  } else if (!options.quiet) {
+    console.error('***********************************************')
+    console.error('Processing ' + options.input)
+    console.error('***********************************************')
   }
 }
 if (!options.output) {
