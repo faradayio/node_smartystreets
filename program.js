@@ -58,9 +58,19 @@ if (!options.authToken) {
 if (!options.input) {
   console.error('Please specify an input file');
   options.help();
+} else {
+  if (options.input == '-') {
+    console.log('***********************************************')
+    console.log('Processing from STDIN')
+    console.log('***********************************************')
+  } else {
+    console.log('***********************************************')
+    console.log('Processing ' + options.input)
+    console.log('***********************************************')
+  }
 }
 if (!options.output) {
-  console.error('Please specify an input file');
+  console.error('Please specify an output file');
   options.help();
 }
 
@@ -89,7 +99,6 @@ if (columnModes.indexOf(options.columnDefinition) != -1) {
   options.structure = JSON.parse( fs.readFileSync(options.columnDefinition, 'utf8') );
 }
 
-
 var readStream = options.input == '-' ? process.stdin : fs.createReadStream(options.input);
 
 var writeStream;
@@ -115,7 +124,6 @@ if (options.outputSplit) {
 
       return false;
     }
-
     var cell = String(row[rowIndex] || '');
 
     if (options.truncateSplit !== 0) {
