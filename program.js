@@ -147,7 +147,7 @@ if (options.outputSplit) {
 
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
   .pipe(through2.obj(function(row, enc, cb){
-    if (!row[options.streetCol]) {
+    if (!row[options.streetCol] && !options.includeInvalid) {
       cb();
     } else if (options.zipcodeFilter !== false && options.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
       cb();
