@@ -1,3 +1,7 @@
+## 1.7.6 (2017-05-15)
+
+Fix loss of rows when splitting.
+
 ## 1.7.2 (2015-12-28)
 
 Remove the workaround added in 1.5.1 since that issue has been fixed
