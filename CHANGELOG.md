@@ -1,4 +1,4 @@
-unreleased
+## 1.7.7 (2017-07-19)
 
 Allow --street-col "HOUSE,PREDIR,STREET,STRTYPE,POSTDIR,APTTYPE,APTNBR".
 
