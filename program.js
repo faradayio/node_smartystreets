@@ -146,7 +146,7 @@ if (options.outputSplit) {
   writeStream.pipe( fs.createWriteStream(options.output) );
 }
 
-var streetColArray = Array.isArray(streetCol);
+var streetColArray = Array.isArray(options.streetCol);
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
   .pipe(through2.obj(function(row, enc, cb){
     if (!streetColArray && !row[options.streetCol]) {

@@ -1,3 +1,7 @@
+## 1.7.8 (2017-07-19)
+
+Fix bug in --street-col
+
 ## 1.7.7 (2017-07-19)
 
 Allow --street-col "HOUSE,PREDIR,STREET,STRTYPE,POSTDIR,APTTYPE,APTNBR".
