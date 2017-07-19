@@ -1,3 +1,7 @@
+unreleased
+
+Allow --street-col "HOUSE,PREDIR,STREET,STRTYPE,POSTDIR,APTTYPE,APTNBR".
+
 ## 1.7.6 (2017-05-15)
 
 Fix loss of rows when splitting.

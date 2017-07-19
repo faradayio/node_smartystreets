@@ -15,7 +15,7 @@ options
   .version(package.version)
   .option('-i, --input [file]', 'Input (csv file) [stdin]', '-')
   .option('-o, --output [file]', 'Output (csv file) [stdout]', '-')
-  .option('-s, --street-col [col]', 'Street col [street]', 'street')
+  .option('-s, --street-col [col_csv]', 'Street col CSV [street]', 'street')
   .option('-z, --zipcode-col [col]', 'Zipcode col [zipcode]', 'zipcode')
   .option('-c, --city-col [col]', 'City col [city]', 'city')
   .option('-S, --state-col [col]', 'State col [state]', 'state') // short forms are dumb
@@ -84,6 +84,7 @@ if (typeof options.dropThreshold !== 'string' || options.dropThreshold.toLowerCa
   }
 }
 
+options.streetCol = (options.streetCol && options.streetCol.indexOf(',') !== -1) ? options.streetCol.split(',') : options.streetCol;
 options.zipcodeFilter = options.zipcodeFilter.length ? options.zipcodeFilter.split(',') : false;
 options.stateFilter = options.stateFilter.length ? options.stateFilter.split(',') : false;
 
@@ -145,9 +146,10 @@ if (options.outputSplit) {
   writeStream.pipe( fs.createWriteStream(options.output) );
 }
 
+var streetColArray = Array.isArray(streetCol);
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
   .pipe(through2.obj(function(row, enc, cb){
-    if (!row[options.streetCol] && !options.includeInvalid) {
+    if (!streetColArray && !row[options.streetCol]) {
       cb();
     } else if (options.zipcodeFilter !== false && options.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
       cb();

@@ -23,7 +23,7 @@ Options:
   -V, --version                   output the version number
   -i, --input [file]              Input (csv file) [stdin]
   -o, --output [file]             Output (csv file) [stdout]
-  -s, --street-col [col]          Street col [street]
+  -s, --street-col [col_csv]      Street col CSV [street]
   -z, --zipcode-col [col]         Zipcode col [zipcode]
   -c, --city-col [col]            City col [city]
   -S, --state-col [col]           State col [state]
@@ -54,9 +54,9 @@ Not required. Default stdin. If included it should be a path to a csv file.
 
 Not required. Default stdout. If included it should be a path to a csv file that does not exist yet.
 
-`-s, --street-col [col]`
+`-s, --street-col [col_csv]`
 
-Not required. Default is 'street'. It should be the name of the column in your input file that contains the first part of the address, e.g. '123 main st'
+Not required. Default is 'street'. It should be the name of the column in your input file that contains the first part of the address, e.g. '123 main st'. You can pass a CSV like "HOUSE,PREDIR,STREET,STRTYPE,POSTDIR,APTTYPE,APTNBR" to auto-combine fields (spaces will be added). Note that, currently, spaces or special characters are not allowed in the CSV.
 
 `-z, --zipcode-col [col]`
 
