@@ -14,6 +14,7 @@
     "url": "https://github.com/faradayio/node_smartystreets.git"
   },
   "main": "index.js",
+  "types": "index.d.ts",
   "preferGlobal": "true",
   "bin": {
     "smartystreets": "program.js"
