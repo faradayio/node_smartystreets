@@ -1,3 +1,7 @@
+## 1.7.9 (2017-07-21)
+
+Add TypeScript declarations.
+
 ## 1.7.8 (2017-07-19)
 
 Fix bug in --street-col
