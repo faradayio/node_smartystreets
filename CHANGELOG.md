@@ -1,3 +1,14 @@
+## 1.8.0 (2017-07-22)
+
+* Bug fixes
+
+  * Fixed columnList concurrency issue when running as a lib
+
+* Enhancements
+
+  * Option outputStreamFormat: "object"
+  * Export grouper (used by CLI, now avail for use in libs)
+
 ## 1.7.9 (2017-07-21)
 
 Add TypeScript declarations.
