@@ -6,21 +6,44 @@ export = smartystreets
  * Create a {@link NodeJS.ReadWriteStream} which consumes CSV records and
  * outputs them with geocoding information from smartystreets.
  *
- * Input records should be objects, with keys corresponding to column names:
+ * Input records should be arrays of objects, with keys corresponding to column
+ * names. This can be done by using `smartystreets.grouper(70)` stream
+ * transformer to batch 70 records together into an array.
  *
- *     { street: "a", zipcode: "b" }
+ *     [{ street: "a", zipcode: "b" }, { street: "c", zipcode: "d"}, ...]
+ *     [{ street: "e", zipcode: "f" }, ...]
  *
  * Output record format is controlled by {@link Options.outputStreamFormat}. By
  * default, the output will be in array format, but if `outputStreamFormat:
  * "object"` is set, output will look like:
  *
  *     { street: "a", zipcode: "b", ss_field1: "...", ... }
+ *     { street: "c", zipcode: "d", ss_field1: "...", ... }
+ *     ...
  *
- * @param opts
+ * @param opts Configuration options.
  */
 declare function smartystreets(opts?: smartystreets.Options): NodeJS.ReadWriteStream
 
 declare namespace smartystreets {
+    /**
+     * Create a stream which transforms input of the form:
+     *
+     *     {a: 1}
+     *     {a: 2}
+     *     {a: 3}
+     *
+     * ...to:
+     *
+     *     [{a: 1}, {a: 2}]
+     *     [{a: 3}]
+     *
+     * ...using the specified `groupSize`.
+     *
+     * @param groupSize The number of records to put in each group.
+     */
+    export function grouper(groupSize: number): NodeJS.ReadWriteStream
+
     /** Geocoding options for smartystreets. */
     export type Options = {
         /**
