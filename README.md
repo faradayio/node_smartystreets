@@ -137,10 +137,13 @@ This module also provides a simple api that you can use in your own node project
 ```
 var Smartystreets = require('smartystreets');
 var fs = require('fs');
+var csv = require('fast-csv');
 
 var geocoder = new Smartystreets(options);
 
 fs.createReadStream('input.csv')
+  .pipe(csv({ headers: true }))
+  .pipe(Smartystreets.grouper(70))
   .pipe(geocoder)
   .pipe(process.stdout);
 ```
@@ -148,6 +151,10 @@ fs.createReadStream('input.csv')
 In this example, `geocoder` is a duplex stream which will take every address that is written to it in CSV format and output a geocoded CSV.
 
 The `options` argument is identical to the options used by the command line tool, except that camelCase is used (street-col -> streetCol) and "input" and "output" are ignored (instead use the piping solution above).
+
+For more API details, see [our TypeScript API declarations][API].
+
+[API]: https://github.com/faradayio/node_smartystreets/blob/master/index.d.ts
 
 ## Notes
 
