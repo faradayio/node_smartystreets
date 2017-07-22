@@ -6,13 +6,23 @@ export = smartystreets
  * Create a {@link NodeJS.ReadWriteStream} which consumes CSV records and
  * outputs them with geocoding information from smartystreets.
  *
+ * Input records should be objects, with keys corresponding to column names:
+ *
+ *     { street: "a", zipcode: "b" }
+ *
+ * Output record format is controlled by {@link Options.outputStreamFormat}. By
+ * default, the output will be in array format, but if `outputStreamFormat:
+ * "object"` is set, output will look like:
+ *
+ *     { street: "a", zipcode: "b", ss_field1: "...", ... }
+ *
  * @param opts
  */
 declare function smartystreets(opts?: smartystreets.Options): NodeJS.ReadWriteStream
 
 declare namespace smartystreets {
     /** Geocoding options for smartystreets. */
-    type Options = {
+    export type Options = {
         /**
          * SmartyStreets auth ID. You can get this
          * {@link here|https://smartystreets.com/account/keys} listed under
@@ -112,5 +122,25 @@ declare namespace smartystreets {
          * potentially-large precision degredation.
          */
         includeInvalid?: boolean
+        /**
+         * Should we stream the output data as objects or as arrays?  Default is
+         * `"array"`, but only for backwards compatibility. Sample array output:
+         *
+         *     ["col1", "col2"]
+         *     ["val1", "val2"]
+         *     ["val3", "val4"]
+         *
+         * Sample object output:
+         *
+         *     {"col1": "val1", "col2": "val2"}
+         *     {"col1": "val3", "col2": "val4"}
+         */
+        outputStreamFormat?: OutputStreamFormat
     }
+
+    /**
+     * Allowed `outputStreamFormat` values. We declare this as a named type
+     * so that our callers can use it in their own APIs if desired.
+     */
+    export type OutputStreamFormat = "object" | "array"
 }
