@@ -13,11 +13,18 @@
     "type": "git",
     "url": "https://github.com/faradayio/node_smartystreets.git"
   },
-  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "build": "node_modules/.bin/tsc && chmod +x dist/program.js",
+    "prepare": "npm run build",
+    "test": "node_modules/.bin/mocha -r ts-node/register --timeout 10000 'test/**/*-tests.ts'"
+  },
+  "main": "dist/index.js",
   "types": "index.d.ts",
-  "preferGlobal": "true",
+  "preferGlobal": true,
   "bin": {
-    "smartystreets": "program.js"
+    "smartystreets": "dist/program.js"
   },
   "dependencies": {
     "async": "^1.0.0",
@@ -28,5 +35,21 @@
     "terminus": "^1.0.11",
     "through2": "^0.6.5",
     "through2-concurrent": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/async": "^2.0.40",
+    "@types/chai": "^4.0.1",
+    "@types/commander": "^2.9.1",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.17",
+    "@types/request": "^2.0.0",
+    "@types/sanitize-filename": "^1.1.28",
+    "@types/sinon": "^2.3.3",
+    "@types/through2": "^2.0.33",
+    "chai": "^4.1.0",
+    "mocha": "^3.4.2",
+    "sinon": "^2.4.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2"
   }
 }

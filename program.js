@@ -3,16 +3,17 @@
 var csv = require('fast-csv');
 var fs = require('fs');
 var options = require('commander');
+var path = require('path');
 var grouper = require('./lib/grouper');
 var geocoder = require('./lib/geocoder');
 var streamSplitter = require('./lib/streamSplitter');
 var through2 = require('through2');
 var sanitizeFilename = require('sanitize-filename');
 
-var package = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
+var packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'));
 
 options
-  .version(package.version)
+  .version(packageJson.version)
   .option('-i, --input [file]', 'Input (csv file) [stdin]', '-')
   .option('-o, --output [file]', 'Output (csv file) [stdout]', '-')
   .option('-s, --street-col [col_csv]', 'Street col CSV [street]', 'street')
