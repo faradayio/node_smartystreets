@@ -150,7 +150,7 @@ if (options.outputSplit) {
     if (typeof headers !== 'undefined') {
       source.write(headers);
     } else {
-      throw new Error()
+      throw new Error("Could not find headers in stream")
     }
     source.pipe( fs.createWriteStream(options.output+'/'+sanitizeFilename(streamName)+'.csv') );
     return source;
