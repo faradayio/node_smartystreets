@@ -1,11 +1,16 @@
-var terminus = require('terminus');
+import stream = require('stream')
+import terminus = require('terminus');
 
-module.exports = function(identifier, constructor, options){
+export default function(
+  identifier: (chunk: string, enc: string) => string | false,
+  constructor: (streamName: string) => NodeJS.WritableStream,
+  options: stream.WritableOptions
+) {
   options = options || {};
-  var streams = {};
+  const streams: { [name: string]: NodeJS.WritableStream } = {};
 
-  var splitter = terminus(options, function(chunk, enc, cb){
-    var streamName = identifier(chunk, enc);
+  const splitter = terminus(options, function(chunk, enc, cb){
+    const streamName = identifier(chunk, enc);
 
     if (streamName === false) {
       cb();
@@ -16,7 +21,7 @@ module.exports = function(identifier, constructor, options){
       streams[streamName] = constructor(streamName);
     }
 
-    var success = streams[streamName].write(chunk);
+    const success = streams[streamName].write(chunk);
 
     if (success === false) {
       streams[streamName].once('drain', cb.bind(null, null));
@@ -24,13 +29,13 @@ module.exports = function(identifier, constructor, options){
       cb();
     }
   });
-  
+
   splitter.on('finish', function flush () {
     for (var name in streams) {
       streams[name].end();
       delete streams[name];
     }
   });
-  
+
   return splitter;
 };

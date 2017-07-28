@@ -14,20 +14,21 @@
     "url": "https://github.com/faradayio/node_smartystreets.git"
   },
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rm -rf lib",
     "prebuild": "npm run clean",
-    "build": "node_modules/.bin/tsc && chmod +x dist/program.js",
+    "build": "node_modules/.bin/tsc && chmod +x lib/program.js",
     "prepare": "npm run build",
+    "pretest": "npm run build",
     "test": "node_modules/.bin/mocha -r ts-node/register --timeout 10000 'test/**/*-tests.ts'"
   },
-  "main": "dist/index.js",
-  "types": "index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "preferGlobal": true,
   "bin": {
-    "smartystreets": "dist/program.js"
+    "smartystreets": "lib/program.js"
   },
   "dependencies": {
-    "async": "^1.0.0",
+    "async": "^2.5.0",
     "commander": "^2.8.1",
     "fast-csv": "^0.6.0",
     "request": "^2.57.0",

@@ -1,14 +1,16 @@
-var assert = require('assert')
-var through2 = require('through2-concurrent');
-var async = require('async');
-var request = require('request');
-var querystring = require('querystring');
+import assert = require('assert')
+import through2 = require('through2-concurrent')
+import async = require('async')
+import request = require('request')
+import stream = require('stream')
+import querystring = require('querystring')
 
-var structuredRow = require('./structuredRow');
+import { Options, DEFAULTS, FullOptions } from './options'
+import structuredRow from './structuredRow'
 
 /** Convert a CSV record object to a record array. */
-var objectToArray = function (columnList, recordObject) {
-  var recordArray = [];
+function objectToArray(columnList: string[], recordObject: { [col: string]: any }) {
+  const recordArray: any[] = [];
   columnList.forEach(function(column){
     recordArray.push(recordObject[column]);
   });
@@ -16,26 +18,55 @@ var objectToArray = function (columnList, recordObject) {
 };
 
 /** Convert a CSV record array to a record object. */
-var arrayToObject = function (columnList, recordArray) {
-  var recordObject = {};
-  for (var i = 0; i < columnList.length; ++i) {
+function arrayToObject(columnList: string[], recordArray: any[]): { [col: string]: any } {
+  const recordObject: { [col: string]: any } = {};
+  for (let i = 0; i < columnList.length; ++i) {
     recordObject[columnList[i]] = recordArray[i];
   }
   return recordObject;
 }
 
-var geocodeChunk = function(item, queue, columnList, progress, pool, options, callback){
-  var streetColArray = Array.isArray(options.streetCol);
-  var rows = item.rows;
+type Progress = {
+  total: number,
+  cached: number,
+  geocoded: number,
+  startTime: [number, number],
+}
+
+type Item = {
+  rows: { [key: string]: any }[]
+  tries: number
+  reportDrop: () => void
+  callback: (arg: any[][]) => void
+}
+
+/**
+ * Some sort of socket pool.
+ *
+ * TODO: Can we get a better type for this? The types in the TypeScript bindings
+ * for Node are very vague.
+ */
+type Pool = { [key: string]: any }
+
+function geocodeChunk(
+  item: Item,
+  queue: { push: (task: Item) => void },
+  columnList: string[],
+  progress: Progress,
+  pool: Pool,
+  options: FullOptions,
+  callback: () => void,
+){
+  const rows = item.rows;
   item.tries++;
   //turn the rows into something smartystreets can read
-  var addressList = rows.map(function(row){
-    var result = {
+  const addressList = rows.map(function(row){
+    const result: { [col: string]: string } = {
       city:     row[options.cityCol] || '',
       state:    row[options.stateCol] || '',
       zipcode:  row[options.zipcodeCol] || ''
     };
-    if (streetColArray) {
+    if (Array.isArray(options.streetCol)) {
       result.street = options.streetCol.map(function(k) {
         return row[k];
       }).join(' ');
@@ -83,15 +114,15 @@ var geocodeChunk = function(item, queue, columnList, progress, pool, options, ca
         setTimeout(function(){
           queue.push(item);
           callback();
-        }, options.retryTimeout || 500);
+        }, options.retryTimeout);
       }
       return;
     }
 
-    var mergeRows = {};
+    const mergeRows: { [key: string]: any } = {};
 
-    for (var i = 0; i < body.length; i++) {
-      var address = body[i];
+    for (let i = 0; i < body.length; i++) {
+      const address = body[i];
       if (address.candidate_index === 0) {
         mergeRows[address.input_index] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
 
@@ -99,25 +130,25 @@ var geocodeChunk = function(item, queue, columnList, progress, pool, options, ca
       }
     }
 
-    var total = progress.total;
+    let total = progress.total;
     progress.total += rows.length;
 
     item.callback(rows.map(function(row, i){
-      var mergeRow = (typeof mergeRows[i] !== 'undefined') ? mergeRows[i] : {};
+      const mergeRow = (typeof mergeRows[i] !== 'undefined') ? mergeRows[i] : {};
 
-      for (var key in mergeRow) {
+      for (const key in mergeRow) {
         row[key] = mergeRow[key];
       }
 
       total++;
 
       if (!options.quiet && options.logInterval && total % options.logInterval === 0) {
-        var elapsed = process.hrtime(progress.startTime);
-        elapsed = elapsed[0] + (elapsed[1]/1e9);
+        const elapsedPair = process.hrtime(progress.startTime);
+        const elapsed = elapsedPair[0] + (elapsedPair[1]/1e9);
 
-        var perSecond = Math.round(progress.total/elapsed);
+        const perSecond = Math.round(progress.total/elapsed);
 
-        var percentGeocoded = (Math.round((progress.geocoded / progress.total * 10000))/100) + '';
+        let percentGeocoded = (Math.round((progress.geocoded / progress.total * 10000))/100) + '';
         if (percentGeocoded.indexOf('.') === -1) {
           percentGeocoded += '.';
         }
@@ -125,7 +156,7 @@ var geocodeChunk = function(item, queue, columnList, progress, pool, options, ca
           percentGeocoded += '0';
         }
 
-        console.log(progress.total+' rows done, '+ percentGeocoded + '% geocoded, ' + perSecond+' rows per second');
+        console.log(`${progress.total} rows done, ${percentGeocoded}% geocoded, ${perSecond} rows per second`);
       }
 
       return objectToArray(columnList, row);
@@ -135,42 +166,30 @@ var geocodeChunk = function(item, queue, columnList, progress, pool, options, ca
   });
 };
 
+export default function (opts: Options): stream.Transform {
+  // Fill in our default options, and guarantee they're _all_ set. This relies
+  // on some fancy TypeScript magic to verify that all defaults are supplied.
+  const options: FullOptions = Object.assign({}, DEFAULTS, opts);
 
-var defaultOptions = {
-  concurrency: 48,
-  outputStreamFormat: "array",
-};
-
-module.exports = function(opts){
-  var options = {};
-  opts = opts || {};
-
-  for (var key in defaultOptions) {
-    options[key] = defaultOptions[key];
-  }
-  for (var key in opts) {
-    options[key] = opts[key];
-  }
-
-  var progress = {
+  const progress = {
     total: 0,
     cached: 0,
     geocoded: 0,
     startTime: process.hrtime()
   };
 
-  var pool = {
+  const pool: Pool = {
     maxSockets: 1024
   };
 
-  var columnList;
-  var geocodingQueue = async.queue(function(chunk, callback){
+  let columnList: string[];
+  const geocodingQueue = async.queue<Item, any>(function(chunk, callback){
     assert.notStrictEqual(columnList, undefined)
     geocodeChunk(chunk, geocodingQueue, columnList, progress, pool, options, callback);
   }, options.concurrency);
 
-  var droppedRecords = 0;
-  var firstRecord = true;
+  let droppedRecords = 0;
+  let firstRecord = true;
 
   return through2.obj(
     {maxConcurrency: options.concurrency},
@@ -179,24 +198,22 @@ module.exports = function(opts){
       if (firstRecord) {
         firstRecord = false;
 
-        var ss_columns = Object.keys(structuredRow(options.structure, {}, options.columnPrefix, options.columnSuffix));
+        const ss_columns = Object.keys(structuredRow(options.structure, {}, options.columnPrefix, options.columnSuffix));
         columnList = Object.keys(rows[0]).concat(ss_columns);
         if (options.outputStreamFormat === "array") {
           this.push(columnList);
         }
       }
 
-      var self = this;
-
       geocodingQueue.push({
         rows: rows,
         tries: 0,
-        callback: function(doneRows){
-          doneRows.forEach(function(row){
+        callback: (doneRows: any[][]) => {
+          doneRows.forEach((row) => {
             if (options.outputStreamFormat === "array") {
-              self.push(row);
+              this.push(row);
             } else {
-              self.push(arrayToObject(columnList, row))
+              this.push(arrayToObject(columnList, row))
             }
           });
           cb();
@@ -204,16 +221,19 @@ module.exports = function(opts){
         reportDrop: function(){
           droppedRecords += rows.length;
           if (typeof options.dropThreshold === 'number' && droppedRecords > options.dropThreshold) {
-            console.error(droppedRecords + ' rows dropped, threshold is ' + options.dropThreshold + ', aborting');
+            console.error(`${droppedRecords} rows dropped, threshold is ${options.dropThreshold}, aborting`);
             process.exit(1);
           }
         }
       });
     }, function(cb){
-      for (var key in pool) {
+      for (const key in pool) {
         if (key !== 'maxSockets') {
-          for (var name in pool[key].sockets) {
-            pool[key].sockets[name].forEach(function(socket){
+          // TODO: Verify that the pool still looks like this internally. Also,
+          // do we need to shut this down manually or is GC/process termination
+          // good enough?
+          for (const name in pool[key].sockets) {
+            pool[key].sockets[name].forEach(function(socket: NodeJS.Socket){
               socket.end();
             });
           }
