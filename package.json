@@ -1,11 +1,19 @@
 {
   "name": "smartystreets",
   "description": "Fast SmartyStreets geocoder",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "maintainers": [
     {
       "name": "Tristan Davies",
       "email": "npm@tristan.io"
+    },
+    {
+      "name": "Eric Kidd",
+      "email": "eric.kidd@gmail.com"
+    },
+    {
+      "name": "Seamus Abshere",
+      "email": "seamus@abshere.net"
     }
   ],
   "license": "MIT",
