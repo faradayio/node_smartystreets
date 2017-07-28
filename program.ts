@@ -77,6 +77,10 @@ if (!options.output) {
   options.help();
 }
 
+if (typeof options.retryTimeout === 'string') {
+  options.retryTimeout = Number(options.retryTimeout)
+}
+
 if (typeof options.dropThreshold !== 'string' || options.dropThreshold.toLowerCase() === 'infinity') {
   options.dropThreshold = null;
 } else {
