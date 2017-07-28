@@ -156,7 +156,9 @@ function geocodeChunk(
           percentGeocoded += '0';
         }
 
-        console.log(`${progress.total} rows done, ${percentGeocoded}% geocoded, ${perSecond} rows per second`);
+        // Use console.warn to print to stderr so we don't mess up streaming
+        // output to stdout.
+        console.warn(`${progress.total} rows done, ${percentGeocoded}% geocoded, ${perSecond} rows per second`);
       }
 
       return objectToArray(columnList, row);
