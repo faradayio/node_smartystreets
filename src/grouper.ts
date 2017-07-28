@@ -1,7 +1,8 @@
-var through2 = require('through2');
+import stream = require('stream')
+import through2 = require('through2');
 
-module.exports = function(groupSize){
-  var group = [];
+export default function(groupSize: number): stream.Transform {
+  let group: any[] = [];
 
   return through2.obj(
     function(row, enc, cb){

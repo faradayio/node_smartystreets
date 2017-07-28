@@ -1,3 +1,14 @@
+## 1.8.1 (2017-07-28)
+
+* Bug fixes
+
+  * Don't print progress to standard out
+  * Be a bit more aggressive about CLI argument validation
+
+* Enhancements
+
+  * Convert code to TypeScript & ES6 syntax internally
+
 ## 1.8.0 (2017-07-22)
 
 * Bug fixes
