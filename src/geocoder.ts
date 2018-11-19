@@ -60,7 +60,7 @@ function geocodeChunk(
   const rows = item.rows;
   item.tries++;
   //turn the rows into something smartystreets can read
-  const geocodeInputsToRowsMap: { [key: number]: number } = {}
+  const geocodeInputsToRowsMap: { [key: string]: number } = {}
   const geocodeInputs: { [key: string]: any }[] = []
   rows.forEach(function(row, i){
     const result: { [col: string]: string } = {
@@ -77,6 +77,7 @@ function geocodeChunk(
     }
     if (result.street.length > 2 && (result.city.length > 1 || result.zipcode.length > 2)) {
       geocodeInputs.push(result)
+      // Integer automatically converted to a string when used as an object key.
       geocodeInputsToRowsMap[geocodeInputs.length - 1] = i
     }
   });
