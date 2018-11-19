@@ -1,11 +1,11 @@
 {
   "name": "smartystreets",
   "description": "Fast SmartyStreets geocoder",
-  "version": "1.8.2",
+  "version": "2.0.0",
   "maintainers": [
     {
-      "name": "Tristan Davies",
-      "email": "npm@tristan.io"
+      "name": "Madeline Davies",
+      "email": "npm@madd.tech"
     },
     {
       "name": "Eric Kidd",

@@ -215,12 +215,9 @@ const geocodeOptions: FullOptions = {
   outputStreamFormat: "array",
 }
 
-const streetColArray = Array.isArray(options.streetCol);
 readStream.pipe(csv({headers: true, delimiter: options.delimiter}))
   .pipe(through2.obj(function(row, enc, cb){
-    if (!streetColArray && !row[options.streetCol]) {
-      cb();
-    } else if (filterOptions.zipcodeFilter !== false && filterOptions.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
+    if (filterOptions.zipcodeFilter !== false && filterOptions.zipcodeFilter.indexOf(row[options.zipcodeCol]) === -1) {
       cb();
     } else if (filterOptions.stateFilter !== false && filterOptions.stateFilter.indexOf(row[options.stateCol]) === -1) {
       cb();
