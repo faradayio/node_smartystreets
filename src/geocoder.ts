@@ -60,9 +60,11 @@ function geocodeChunk(
   const rows = item.rows;
   item.tries++;
   //turn the rows into something smartystreets can read
-  const addressList = rows.map(function(row){
+  const geocodeInputsToRowsMap: { [key: string]: number } = {}
+  const geocodeInputs: { [key: string]: any }[] = []
+  rows.forEach(function(row, i){
     const result: { [col: string]: string } = {
-      city:     row[options.cityCol] || '',
+      city:     row[options.cityCol] || '', // this should be null not '' when empty...
       state:    row[options.stateCol] || '',
       zipcode:  row[options.zipcodeCol] || ''
     };
@@ -73,10 +75,14 @@ function geocodeChunk(
     } else {
       result.street = row[options.streetCol] || '';
     }
-    return result;
+    if (result.street.length > 2 && (result.city.length > 1 || result.zipcode.length > 2)) {
+      geocodeInputs.push(result)
+      // Integer automatically converted to a string when used as an object key.
+      geocodeInputsToRowsMap[geocodeInputs.length - 1] = i
+    }
   });
 
-  if (!addressList.length) {
+  if (!geocodeInputs.length) {
     process.nextTick(callback);
     return;
   }
@@ -90,7 +96,7 @@ function geocodeChunk(
       'auth-id': options.authId,
       'auth-token': options.authToken
     }),
-    json: addressList,
+    json: geocodeInputs,
     forever: true,
     pool: pool, //don't use the default connection pool (for performance)
     timeout: 1000 * 30 //30 second timeout
@@ -119,12 +125,12 @@ function geocodeChunk(
       return;
     }
 
-    const mergeRows: { [key: string]: any } = {};
+    const geocodeOutputs: { [key: string]: any } = {};
 
     for (let i = 0; i < body.length; i++) {
       const address = body[i];
       if (address.candidate_index === 0) {
-        mergeRows[address.input_index] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
+        geocodeOutputs[geocodeInputsToRowsMap[address.input_index]] = structuredRow(options.structure, address, options.columnPrefix, options.columnSuffix);
 
         progress.geocoded++;
       }
@@ -134,10 +140,10 @@ function geocodeChunk(
     progress.total += rows.length;
 
     item.callback(rows.map(function(row, i){
-      const mergeRow = (typeof mergeRows[i] !== 'undefined') ? mergeRows[i] : {};
+      const geocodeOutput = (typeof geocodeOutputs[i] !== 'undefined') ? geocodeOutputs[i] : {};
 
-      for (const key in mergeRow) {
-        row[key] = mergeRow[key];
+      for (const key in geocodeOutput) {
+        row[key] = geocodeOutput[key];
       }
 
       total++;

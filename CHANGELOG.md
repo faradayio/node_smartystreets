@@ -1,3 +1,9 @@
+## 2.0.0 (2018-11-19)
+
+* Breaking changes
+
+  * Include all input rows in output
+
 ## 1.8.2 (2017-07-28)
 
 * Re-publishing
