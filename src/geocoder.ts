@@ -83,7 +83,8 @@ function geocodeChunk(
   });
 
   if (!geocodeInputs.length) {
-    process.nextTick(callback);
+    item.callback([])
+    callback()
     return;
   }
 
