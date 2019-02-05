@@ -83,8 +83,7 @@ function geocodeChunk(
   });
 
   if (!geocodeInputs.length) {
-    const output = options.includeInvalid ? rows.map(row => objectToArray(columnList, row)) : []
-    item.callback(output)
+    item.callback(rows.map(row => objectToArray(columnList, row)))
     callback()
     return;
   }
@@ -114,8 +113,7 @@ function geocodeChunk(
         }
         callback();
         item.reportDrop();
-        const output = options.includeInvalid ? rows.map(row => objectToArray(columnList, row)) : []
-        item.callback(output)
+        item.callback(rows.map(row => objectToArray(columnList, row)))
       } else {
         if (!options.quiet) {
           console.error('  retrying chunk');
