@@ -75,7 +75,7 @@ function geocodeChunk(
     } else {
       result.street = row[options.streetCol] || '';
     }
-    if (result.street.length > 2 && (result.city.length > 1 || result.zipcode.length > 2)) {
+    if (result.street.length > 2) {
       geocodeInputs.push(result)
       // Integer automatically converted to a string when used as an object key.
       geocodeInputsToRowsMap[geocodeInputs.length - 1] = i

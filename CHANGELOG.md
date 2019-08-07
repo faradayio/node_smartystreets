@@ -1,4 +1,32 @@
-## 2.0.0 (2018-11-19)
+## 3.0.2 (2019-08-07)
+
+* Bug fixes
+
+  * Fix "freeform" input mode
+
+## 3.0.1 (2019-02-05) - BROKEN
+
+* Bug fixes
+
+  * Always include everything, even if --include-invalid isn't passed
+
+## 3.0.0 (2019-02-05) - BROKEN
+
+[nothing]
+
+## 2.0.2 (2019-02-05) - BROKEN
+
+* Bug fixes
+
+  * Fix dups due to missed callback
+
+## 2.0.1 (2018-11-25) - BROKEN
+
+* Bug fixes
+
+  * Fix dups due to bad fast-csv
+
+## 2.0.0 (2018-11-19) - BROKEN
 
 * Breaking changes
 
